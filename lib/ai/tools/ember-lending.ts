@@ -1,8 +1,7 @@
-import { tool } from 'ai';
+import { tool, type CoreTool } from 'ai';
 import { z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import { Tool } from '@modelcontextprotocol/sdk/types.js';
 
 /*export const getEmberLending = tool({
   description: 'Get the current weather at a location',
@@ -20,7 +19,7 @@ import { Tool } from '@modelcontextprotocol/sdk/types.js';
   },
 }); */
 
-export const getTools = async () : Promise<Tool[]> => {
+export const getTools = async () : Promise<{ [key: string]: CoreTool }> => {
   const serverUrl = process.env.MCP_SERVER_URL || 'http://localhost:3010'; 
   let mcpClient = null;
 
@@ -73,9 +72,11 @@ export const getTools = async () : Promise<Tool[]> => {
   // Try to discover tools
   console.log("Attempting to discover tools via MCP client...");
   const toolsResponse = await mcpClient.listTools();
-  const toolArray = toolsResponse.tools.map((mcptool) => {
+  
+  // Use reduce to create an object mapping tool names to AI tools
+  const toolObject = toolsResponse.tools.reduce((acc, mcptool) => {
     // Convert MCP tool schema to Zod schema
-    return tool({
+    const aiTool = tool({
       description: mcptool.description,
       parameters: convertToZodSchema(mcptool.inputSchema),
       execute: async (args) => {
@@ -86,8 +87,11 @@ export const getTools = async () : Promise<Tool[]> => {
         return result;
       },
     });
-  });
+    // Add the tool to the accumulator object, using its name as the key
+    acc[mcptool.name] = aiTool;
+    return acc;
+  }, {} as { [key: string]: CoreTool }); // Initialize with the correct type
 
-  // Return the array of tools, ready to be used by the AI model
-  return toolArray as unknown as Tool[];
+  // Return the object of tools
+  return toolObject;
 }

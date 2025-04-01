@@ -25,7 +25,7 @@ import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
-import { getTools } from '@/lib/ai/tools/ember-lending';
+import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
 
 export const maxDuration = 60;
 
@@ -80,8 +80,11 @@ export async function POST(request: Request) {
       ],
     });
 
+    // Get dynamic tools
+    const dynamicTools = await getDynamicTools();
+    const dynamicToolNames = Object.keys(dynamicTools);
 
-    const toolList = await getTools();
+    const toolList = await getDynamicTools();
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
@@ -89,15 +92,6 @@ export async function POST(request: Request) {
           system: systemPrompt({ selectedChatModel }),
           messages,
           maxSteps: 5,
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
           tools: {
@@ -108,7 +102,7 @@ export async function POST(request: Request) {
               session,
               dataStream,
             }),
-            ...toolList,
+            ...dynamicTools
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
