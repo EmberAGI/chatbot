@@ -156,7 +156,8 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    return new Response('An error occurred while processing your request!', {
+    const JSONerror = JSON.stringify(error, null, 2);
+    return new Response(`An error occurred while processing your request! ${JSONerror}` , {
       status: 404,
     });
   }
