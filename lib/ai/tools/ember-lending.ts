@@ -84,6 +84,7 @@ export const getTools = async () : Promise<{ [key: string]: CoreTool }> => {
           name: mcptool.name,
           arguments: args,
         });
+        console.log(result);
         return result;
       },
     });
