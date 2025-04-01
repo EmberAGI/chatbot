@@ -38,7 +38,7 @@ export const getEmberLending = tool({
 
 export const getTools = async () => {
   const serverUrl = process.env.MCP_SERVER_URL || 'http://localhost:3010'; 
-let mcpClient = null;
+  let mcpClient = null;
 
   // Create MCP Client
   mcpClient = new Client(
@@ -53,10 +53,57 @@ let mcpClient = null;
   await mcpClient.connect(transport);
   console.log("MCP client initialized successfully!");
 
+  // Helper function to convert MCP tool schema to Zod schema
+  const convertToZodSchema = (schema: any): z.ZodSchema => {
+    if (!schema) return z.object({});
+    
+    // If it's already a Zod schema, return it
+    if (schema._def !== undefined) return schema;
+    
+    // For an object schema, convert properties
+    if (schema.type === 'object' && schema.properties) {
+      const zodProperties: { [key: string]: z.ZodTypeAny } = {};
+      Object.entries(schema.properties).forEach(([key, propSchema]: [string, any]) => {
+        switch (propSchema.type) {
+          case 'string':
+            zodProperties[key] = z.string();
+            break;
+          case 'number':
+            zodProperties[key] = z.number();
+            break;
+          case 'boolean':
+            zodProperties[key] = z.boolean();
+            break;
+          default:
+            // Default to any for complex types
+            zodProperties[key] = z.any();
+        }
+      });
+      return z.object(zodProperties);
+    }
+    
+    // Default fallback
+    return z.object({});
+  };
+
   // Try to discover tools
   console.log("Attempting to discover tools via MCP client...");
   const toolsResponse = await mcpClient.listTools();
-  const toolArray = toolsResponse.tools.map((mcptool) => tool( mcptool ));
-  
+  const toolArray = toolsResponse.tools.map((mcptool) => {
+    // Convert MCP tool schema to Zod schema
+    return tool({
+      description: mcptool.description,
+      parameters: convertToZodSchema(mcptool.inputSchema),
+      execute: async (args) => {
+        const result = await mcpClient.callTool({
+          name: mcptool.name,
+          arguments: args,
+        });
+        return result;
+      },
+    });
+  });
 
+  // Return the array of tools, ready to be used by the AI model
+  return toolArray;
 }
