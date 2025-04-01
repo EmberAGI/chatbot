@@ -183,7 +183,7 @@ const PurePreviewMessage = ({
 
                 if (state === 'result') {
                   const { result } = toolInvocation;
-
+                  console.log('toolInvocationResult', toolInvocation);
                   return (
                     <div key={toolCallId}>
                       {toolName === 'getWeather' ? (
@@ -206,7 +206,7 @@ const PurePreviewMessage = ({
                           isReadonly={isReadonly}
                         />
                       ) : (
-                        <pre>{JSON.stringify(result, null, 2)}</pre>
+                        <pre>{result}</pre>
                       )}
                     </div>
                   );
