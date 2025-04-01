@@ -2,6 +2,7 @@ import { tool } from 'ai';
 import { z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
+import { Tool } from '@modelcontextprotocol/sdk/types.js';
 
 /*export const getEmberLending = tool({
   description: 'Get the current weather at a location',
@@ -19,24 +20,7 @@ import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
   },
 }); */
 
-export const getEmberLending = tool({
-  description: 'Get the current weather at a location',
-  parameters: z.object({
-    latitude: z.number(),
-    longitude: z.number(),
-  }),
-  execute: async ({ latitude, longitude }) => {
-    const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=temperature_2m&daily=sunrise,sunset&timezone=auto`,
-    );
-
-    const weatherData = await response.json();
-    return weatherData;
-  },
-});
-
-
-export const getTools = async () => {
+export const getTools = async () : Promise<Tool[]> => {
   const serverUrl = process.env.MCP_SERVER_URL || 'http://localhost:3010'; 
   let mcpClient = null;
 
@@ -105,5 +89,5 @@ export const getTools = async () => {
   });
 
   // Return the array of tools, ready to be used by the AI model
-  return toolArray;
+  return toolArray as unknown as Tool[];
 }
