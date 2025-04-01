@@ -20,7 +20,7 @@ import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 }); */
 
 export const getTools = async () : Promise<{ [key: string]: CoreTool }> => {
-  const serverUrl = process.env.MCP_SERVER_URL || 'http://localhost:3010'; 
+  const serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/sse'; 
   let mcpClient = null;
 
   // Create MCP Client
