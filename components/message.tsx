@@ -152,7 +152,7 @@ const PurePreviewMessage = ({
 
                 if (state === 'call') {
                   const { args } = toolInvocation;
-
+                  console.log('toolInvocation', toolInvocation);
                   return (
                     <div
                       key={toolCallId}
@@ -176,7 +176,7 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
-                      ) : null}
+                      ) : <div>Tool: {toolName}</div>}
                     </div>
                   );
                 }

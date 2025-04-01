@@ -82,8 +82,7 @@ export async function POST(request: Request) {
 
     // Get dynamic tools
     const dynamicTools = await getDynamicTools();
-    const dynamicToolNames = Object.keys(dynamicTools);
-
+  
     const toolList = await getDynamicTools();
     return createDataStreamResponse({
       execute: (dataStream) => {
