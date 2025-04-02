@@ -84,8 +84,9 @@ export const getTools = async () : Promise<{ [key: string]: CoreTool }> => {
           name: mcptool.name,
           arguments: args,
         });
+        console.log('RUNNING TOOL:', mcptool.name);
         console.log(result);
-        return result;
+        return { status: 'completed', result: result };
       },
     });
     // Add the tool to the accumulator object, using its name as the key
