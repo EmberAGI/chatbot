@@ -83,8 +83,7 @@ export async function POST(request: Request) {
     // Get dynamic tools
     const dynamicTools = await getDynamicTools();
   
-    const toolList = await getDynamicTools();
-    return createDataStreamResponse({
+      return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
@@ -144,6 +143,8 @@ export async function POST(request: Request) {
             functionId: 'stream-text',
           },
         });
+          
+        console.log('FN RES', result);
 
         result.consumeStream();
 
