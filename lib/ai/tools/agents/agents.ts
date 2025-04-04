@@ -8,11 +8,11 @@ interface ChatAgent {
     {
       id: 'ember-lending',
       name: 'Lending',
-      description: 'Primary model for all-purpose chat',
+      description: 'Ember lending agent',
     },
     {
       id: 'ember-test',
       name: 'Test',
-      description: 'Uses advanced reasoning',
+      description: 'Ember test agent',
     },
   ];

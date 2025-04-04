@@ -21,10 +21,12 @@ import { cookies } from 'next/headers';
 }); */
 
 export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
+  console.log("Initializing MCP client...");
   
   //POC: Change avaliable tools based on  cookie agent
   const cookieStore = await cookies();
   const agentIdFromCookie = cookieStore.get('agent');
+  console.log(agentIdFromCookie);
   let serverUrl = ''
 
   if (agentIdFromCookie && agentIdFromCookie.value === 'ember-lending') {
@@ -96,6 +98,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   let toolsResponse;
   try {
     toolsResponse = await mcpClient.listTools();
+    console.log(toolsResponse);
   } catch (error) {
     console.error("Error discovering tools:", error);
     toolsResponse = { tools: [] }; // Fallback to empty tools array
