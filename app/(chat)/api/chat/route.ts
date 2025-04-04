@@ -26,6 +26,7 @@ import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
+import { cookies } from 'next/headers';
 
 export const maxDuration = 60;
 
@@ -82,7 +83,7 @@ export async function POST(request: Request) {
 
     // Get dynamic tools
     const dynamicTools = await getDynamicTools();
-  
+
       return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({

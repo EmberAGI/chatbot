@@ -10,6 +10,7 @@ export default async function Page() {
 
   const cookieStore = await cookies();
   const modelIdFromCookie = cookieStore.get('chat-model');
+  const agentIdFromCookie = cookieStore.get('agent');
 
   if (!modelIdFromCookie) {
     return (
@@ -19,6 +20,7 @@ export default async function Page() {
           id={id}
           initialMessages={[]}
           selectedChatModel={DEFAULT_CHAT_MODEL}
+          selectedChatAgent={'ember-lending'}
           selectedVisibilityType="private"
           isReadonly={false}
         />
@@ -27,6 +29,24 @@ export default async function Page() {
     );
   }
 
+  if (!agentIdFromCookie) {
+    return (
+      <>
+        <Chat
+          key={id}
+          id={id}
+          initialMessages={[]}
+          selectedChatModel={DEFAULT_CHAT_MODEL}
+          selectedChatAgent={'ember-lending'}
+          selectedVisibilityType="private"
+          isReadonly={false}
+        />
+        <DataStreamHandler id={id} />
+      </>
+    );
+  }
+  
+
   return (
     <>
       <Chat
@@ -34,6 +54,7 @@ export default async function Page() {
         id={id}
         initialMessages={[]}
         selectedChatModel={modelIdFromCookie.value}
+        selectedChatAgent={agentIdFromCookie?.value || ''}
         selectedVisibilityType="private"
         isReadonly={false}
       />

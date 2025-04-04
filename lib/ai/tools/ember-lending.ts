@@ -2,6 +2,7 @@ import { tool, type CoreTool } from 'ai';
 import { z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
+import { cookies } from 'next/headers';
 
 /*export const getEmberLending = tool({
   description: 'Get the current weather at a location',
@@ -19,8 +20,23 @@ import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
   },
 }); */
 
-export const getTools = async () : Promise<{ [key: string]: CoreTool }> => {
-  const serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/sse'; 
+export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
+  
+  //POC: Change avaliable tools based on  cookie agent
+  const cookieStore = await cookies();
+  const agentIdFromCookie = cookieStore.get('agent');
+  let serverUrl = ''
+
+  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-lending') {
+    serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/sse'; 
+  }
+
+  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-lending') {
+    serverUrl = 'null'; 
+  }
+
+
+  
   let mcpClient = null;
 
   // Create MCP Client
@@ -30,12 +46,18 @@ export const getTools = async () : Promise<{ [key: string]: CoreTool }> => {
   );
   
   // Create SSE transport
-  const transport = new SSEClientTransport(new URL(serverUrl));
+  let transport = null
+  if (serverUrl) {
+    transport = new SSEClientTransport(new URL(serverUrl));
+  }
+  
   
   // Connect to the server
-  await mcpClient.connect(transport);
-  console.log("MCP client initialized successfully!");
-
+  if (transport) {
+    await mcpClient.connect(transport);
+    console.log("MCP client initialized successfully!");
+  }
+  
   // Helper function to convert MCP tool schema to Zod schema
   const convertToZodSchema = (schema: any): z.ZodSchema => {
     if (!schema) return z.object({});
@@ -71,7 +93,14 @@ export const getTools = async () : Promise<{ [key: string]: CoreTool }> => {
 
   // Try to discover tools
   console.log("Attempting to discover tools via MCP client...");
-  const toolsResponse = await mcpClient.listTools();
+  let toolsResponse;
+  try {
+    toolsResponse = await mcpClient.listTools();
+  } catch (error) {
+    console.error("Error discovering tools:", error);
+    toolsResponse = { tools: [] }; // Fallback to empty tools array
+  }
+ 
   
   // Use reduce to create an object mapping tool names to AI tools
   const toolObject = toolsResponse.tools.reduce((acc, mcptool) => {

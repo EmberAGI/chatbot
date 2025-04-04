@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useWindowSize } from 'usehooks-ts';
 
 import { ModelSelector } from '@/components/model-selector';
+import { AgentSelector } from './agent-selector';
 import { SidebarToggle } from '@/components/sidebar-toggle';
 import { Button } from '@/components/ui/button';
 import { PlusIcon, VercelIcon } from './icons';
@@ -18,11 +19,13 @@ function PureChatHeader({
   selectedModelId,
   selectedVisibilityType,
   isReadonly,
+  selectedAgentId,
 }: {
   chatId: string;
   selectedModelId: string;
   selectedVisibilityType: VisibilityType;
   isReadonly: boolean;
+  selectedAgentId: string;
 }) {
   const router = useRouter();
   const { open } = useSidebar();
@@ -53,10 +56,16 @@ function PureChatHeader({
       )}
 
       {!isReadonly && (
+        <>
         <ModelSelector
           selectedModelId={selectedModelId}
           className="order-1 md:order-2"
         />
+        <AgentSelector
+          selectedAgentId={selectedAgentId}
+          className="order-1 md:order-2"
+          />
+        </>
       )}
 
       {!isReadonly && (
