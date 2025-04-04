@@ -93,5 +93,4 @@ function PureChatHeader({
 }
 
 export const ChatHeader = memo(PureChatHeader, (prevProps, nextProps) => {
-  return prevProps.selectedModelId === nextProps.selectedModelId;
-});
+  return prevProps.selectedModelId === nextProps.selectedModelId && prevProps.selectedAgentId === nextProps.selectedAgentId });

@@ -51,7 +51,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   const chatModelFromCookie = cookieStore.get('chat-model');
   const agentIdFromCookie = cookieStore.get('agent');
 
-  if (!chatModelFromCookie) {
+  if (!chatModelFromCookie && !agentIdFromCookie) {
     return (
       <>
         <Chat
@@ -67,29 +67,15 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     );
   }
 
-  if (!agentIdFromCookie) {
-    return (
-      <>
-        <Chat
-          id={chat.id}
-          initialMessages={convertToUIMessages(messagesFromDb)}
-          selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedChatAgent={'ember-lending'}
-          selectedVisibilityType={chat.visibility}
-          isReadonly={session?.user?.id !== chat.userId}
-        />
-        <DataStreamHandler id={id} />
-      </>
-    );
-  }
+
 
   return (
     <>
       <Chat
         id={chat.id}
         initialMessages={convertToUIMessages(messagesFromDb)}
-        selectedChatModel={chatModelFromCookie.value}
-        selectedChatAgent={agentIdFromCookie?.value || ''}
+        selectedChatModel={chatModelFromCookie?.value || DEFAULT_CHAT_MODEL}
+        selectedChatAgent={agentIdFromCookie?.value || 'ember-lending'}
         selectedVisibilityType={chat.visibility}
         isReadonly={session?.user?.id !== chat.userId}
       />
