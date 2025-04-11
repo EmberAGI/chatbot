@@ -34,7 +34,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   }
 
   if (agentIdFromCookie && agentIdFromCookie.value === 'ember-test') {
-    serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/';; 
+    serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3011/sse';; 
   }
 
 

@@ -23,6 +23,7 @@ import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
 import { UseChatHelpers } from '@ai-sdk/react';
+import { AgentSelector } from './ui/agent-chips';
 
 function PureMultimodalInput({
   chatId,
@@ -249,6 +250,7 @@ function PureMultimodalInput({
       />
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
+        <AgentSelector selectedAgentId='ember-lending'></AgentSelector>
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 

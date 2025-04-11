@@ -194,6 +194,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      toggle-group:
+        specifier: link:@/components/ui/toggle-group
+        version: link:@/components/ui/toggle-group
       usehooks-ts:
         specifier: ^3.1.0
         version: 3.1.1(react@19.0.0-rc-45804af1-20241021)

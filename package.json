@@ -81,6 +81,7 @@
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "toggle-group": "link:@/components/ui/toggle-group",
     "usehooks-ts": "^3.1.0",
     "zod": "^3.23.8"
   },
