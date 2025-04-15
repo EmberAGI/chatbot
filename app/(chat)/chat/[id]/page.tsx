@@ -58,7 +58,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           id={chat.id}
           initialMessages={convertToUIMessages(messagesFromDb)}
           selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedChatAgent={'ember-lending'}
+          selectedChatAgent={'all'}
           selectedVisibilityType={chat.visibility}
           isReadonly={session?.user?.id !== chat.userId}
         />
@@ -75,7 +75,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         id={chat.id}
         initialMessages={convertToUIMessages(messagesFromDb)}
         selectedChatModel={chatModelFromCookie?.value || DEFAULT_CHAT_MODEL}
-        selectedChatAgent={agentIdFromCookie?.value || 'ember-lending'}
+        selectedChatAgent={agentIdFromCookie?.value || 'all'}
         selectedVisibilityType={chat.visibility}
         isReadonly={session?.user?.id !== chat.userId}
       />

@@ -61,10 +61,6 @@ function PureChatHeader({
           selectedModelId={selectedModelId}
           className="order-1 md:order-2"
         />
-        <AgentSelector
-          selectedAgentId={selectedAgentId}
-          className="order-1 md:order-2"
-          />
         </>
       )}
 

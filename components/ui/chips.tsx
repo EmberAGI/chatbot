@@ -27,7 +27,7 @@ export function ChipToggle({ options, defaultValue, onValueChange }: ChipToggleP
             className={`
               rounded-full px-4 py-2 text-sm font-medium transition-colors
               border border-gray-200 
-              ${isSelected ? "bg-gray-900 text-white" : "bg-white text-gray-700 hover:bg-gray-100"}
+              ${isSelected ? "bg-white text-gray-700" : " bg-gray-900 text-white hover:bg-gray-100"}
             `}
           >
             {option.label}

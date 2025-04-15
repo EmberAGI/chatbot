@@ -5,14 +5,15 @@ interface ChatAgent {
   }
   
   export const chatAgents: Array<ChatAgent> = [
-    {
-      id: 'ember-lending',
-      name: 'Lending',
-      description: 'Ember lending agent',
+      {
+      id: 'ember-aave',
+      name: 'Ember AAVE',
+      description: 'AAVE lending agent',
     },
     {
-      id: 'ember-test',
-      name: 'Test',
-      description: 'Ember test agent',
+      id: 'ember-camelot',
+      name: 'Ember Camelot',
+      description: 'Camelot Swapping agent',
     },
+    
   ];
