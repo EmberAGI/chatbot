@@ -166,7 +166,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
           arguments: args,
          });
         //const result = 'chat lending USDC successfully';
-        console.log('RUNNING TOOL:', mcptool.name);
+        console.log('RUNNING TOOLS:', mcptool.name);
         console.log(result);
         const toolResult = {status: 'completed', result: result}
         return toolResult;
