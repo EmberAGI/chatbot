@@ -152,7 +152,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   }
   console.log("Discovered tools:", toolsResponse);
   // Use reduce to create an object mapping tool names to AI tools
-  toolObject = toolsResponse.tools.reduce((acc, mcptool) => {
+  toolObject = toolsResponse.tools.reduce((acc: any, mcptool: any) => {
     // Convert MCP tool schema to Zod schema
     const aiTool = tool({
       description: mcptool.description,
