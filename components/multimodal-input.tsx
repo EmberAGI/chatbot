@@ -250,7 +250,7 @@ function PureMultimodalInput({
       />
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
-        <AgentSelector selectedAgentId='ember-lending'></AgentSelector>
+        <AgentSelector selectedAgentId='all'></AgentSelector>
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
       </div>
 

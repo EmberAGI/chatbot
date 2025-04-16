@@ -20,7 +20,7 @@ export default async function Page() {
           id={id}
           initialMessages={[]}
           selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedChatAgent={'ember-lending'}
+          selectedChatAgent={'all'}
           selectedVisibilityType="private"
           isReadonly={false}
         />
@@ -38,7 +38,7 @@ export default async function Page() {
           id={id}
           initialMessages={[]}
           selectedChatModel={modelIdFromCookie?.value || DEFAULT_CHAT_MODEL}
-          selectedChatAgent={agentIdFromCookie?.value || 'ember-lending'}
+          selectedChatAgent={agentIdFromCookie?.value || 'all'}
           selectedVisibilityType="private"
           isReadonly={false}
         />
