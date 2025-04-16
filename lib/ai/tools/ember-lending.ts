@@ -27,58 +27,36 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   const cookieStore = await cookies();
   const agentIdFromCookie = cookieStore.get('agent');
   console.log(agentIdFromCookie);
-  let serverUrl : string | string[] = '' 
+  let serverUrl = ''
 
-  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-aave') {
+  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-lending') {
     serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/sse'; 
   }
 
-  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-camelot') {
+  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-test') {
     serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3011/sse';; 
   }
 
-  if (agentIdFromCookie && agentIdFromCookie.value === 'all') {
-    serverUrl = [
-      process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/sse',
-      process.env.MCP_SERVER_URL || 'http://173.230.139.151:3011/sse'
-    ]
-  }
+
   
-  let mcpClient :any = null;
+  let mcpClient = null;
 
   // Create MCP Client
-  if (typeof serverUrl === 'string') {
-    mcpClient = new Client(
-      { name: 'TestClient', version: '1.0.0' },
-      { capabilities: { tools: {}, resources: {}, prompts: {} } }
-    );
-  } else {
-    mcpClient = [];
-    serverUrl.forEach((el)=>mcpClient.push(new Client(
-      { name: 'TestClient', version: '1.0.0' },
-      { capabilities: { tools: {}, resources: {}, prompts: {} } }
-    )))
-   }
- 
+  mcpClient = new Client(
+    { name: 'TestClient', version: '1.0.0' },
+    { capabilities: { tools: {}, resources: {}, prompts: {} } }
+  );
   
   // Create SSE transport
   let transport = null
-  if (typeof serverUrl === 'string') {
+  if (serverUrl) {
     transport = new SSEClientTransport(new URL(serverUrl));
-  } else {
-    // If serverUrl is an array, create multiple transports
-    transport = serverUrl.map((url) => new SSEClientTransport(new URL(url)));
   }
   
   
   // Connect to the server
   if (transport) {
-    if (Array.isArray(transport)) {
-      // Connect to multiple transports
-      await Promise.all(transport.map((t,i) => mcpClient[i].connect(t)));
-    } else {
-      await mcpClient.connect(transport);
-    }
+    await mcpClient.connect(transport);
     console.log("MCP client initialized successfully!");
   }
   
@@ -118,41 +96,17 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   // Try to discover tools
   console.log("Attempting to discover tools via MCP client...");
   let toolsResponse;
-  if (typeof serverUrl === 'string') {
-    try {
-      toolsResponse = await mcpClient.listTools();
-      console.log(toolsResponse);
-    } catch (error) {
-      console.error("Error discovering tools:", error);
-      toolsResponse = { tools: [] }; // Fallback to empty tools array
-    }
-  } else {
-    // If serverUrl is an array, try to discover tools from each client
-    toolsResponse = await Promise.all(
-      mcpClient.map(async (client:any) => {
-        try {
-          return await client.listTools();
-        } catch (error) {
-          console.error("Error discovering tools:", error);
-          return { tools: [] }; // Fallback to empty tools array
-        }
-      })
-    );
+  try {
+    toolsResponse = await mcpClient.listTools();
+    console.log(toolsResponse);
+  } catch (error) {
+    console.error("Error discovering tools:", error);
+    toolsResponse = { tools: [] }; // Fallback to empty tools array
   }
  
-  let toolObject: any;
-
-  // If serverUrl is an array, flatten the tools array
-  if (Array.isArray(toolsResponse)) {
-    toolsResponse = toolsResponse.reduce((acc, curr) => {
-      return acc.concat(curr.tools);
-    }, []);
-  } else {
-    toolsResponse = toolsResponse.tools;
-  }
-  console.log("Discovered tools:", toolsResponse);
+  
   // Use reduce to create an object mapping tool names to AI tools
-  toolObject = toolsResponse.tools.reduce((acc: any, mcptool: any) => {
+  const toolObject = toolsResponse.tools.reduce((acc, mcptool) => {
     // Convert MCP tool schema to Zod schema
     const aiTool = tool({
       description: mcptool.description,
@@ -166,7 +120,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
           arguments: args,
          });
         //const result = 'chat lending USDC successfully';
-        console.log('RUNNING TOOLS:', mcptool.name);
+        console.log('RUNNING TOOL:', mcptool.name);
         console.log(result);
         const toolResult = {status: 'completed', result: result}
         return toolResult;
