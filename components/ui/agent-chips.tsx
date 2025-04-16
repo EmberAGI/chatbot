@@ -32,7 +32,8 @@ export function AgentSelector({
   );
 
   return (
-    <ChipToggle options={options} defaultValue={optimisticAgentId} onValueChange={(value) => {
+    <ChipToggle options={options} defaultValue='ember-lending' onValueChange={(value) => {
+      console.log(value)
       startTransition(() => {
         setOptimisticAgentId(value);
         saveChatAgentAsCookie(value);
