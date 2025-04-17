@@ -22,6 +22,39 @@ import { cookies } from 'next/headers';
 
 export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   console.log("Initializing MCP client...");
+
+   // Helper function to convert MCP tool schema to Zod schema
+   const convertToZodSchema = (schema: any): z.ZodSchema => {
+    if (!schema) return z.object({});
+    
+    // If it's already a Zod schema, return it
+    if (schema._def !== undefined) return schema;
+    
+    // For an object schema, convert properties
+    if (schema.type === 'object' && schema.properties) {
+      const zodProperties: { [key: string]: z.ZodTypeAny } = {};
+      Object.entries(schema.properties).forEach(([key, propSchema]: [string, any]) => {
+        switch (propSchema.type) {
+          case 'string':
+            zodProperties[key] = z.string();
+            break;
+          case 'number':
+            zodProperties[key] = z.number();
+            break;
+          case 'boolean':
+            zodProperties[key] = z.boolean();
+            break;
+          default:
+            // Default to any for complex types
+            zodProperties[key] = z.any();
+        }
+      });
+      return z.object(zodProperties);
+    }
+    
+    // Default fallback
+    return z.object({});
+  };
   
   //POC: Change avaliable tools based on  cookie agent
   const cookieStore = await cookies();
@@ -110,8 +143,6 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
 
   } else { 
 
-   
-
     let mcpClient = null;
   
     // Create MCP Client
@@ -175,42 +206,4 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   return toolObject;
 
   }
-
-
-  
-  
-  // Helper function to convert MCP tool schema to Zod schema
-  const convertToZodSchema = (schema: any): z.ZodSchema => {
-    if (!schema) return z.object({});
-    
-    // If it's already a Zod schema, return it
-    if (schema._def !== undefined) return schema;
-    
-    // For an object schema, convert properties
-    if (schema.type === 'object' && schema.properties) {
-      const zodProperties: { [key: string]: z.ZodTypeAny } = {};
-      Object.entries(schema.properties).forEach(([key, propSchema]: [string, any]) => {
-        switch (propSchema.type) {
-          case 'string':
-            zodProperties[key] = z.string();
-            break;
-          case 'number':
-            zodProperties[key] = z.number();
-            break;
-          case 'boolean':
-            zodProperties[key] = z.boolean();
-            break;
-          default:
-            // Default to any for complex types
-            zodProperties[key] = z.any();
-        }
-      });
-      return z.object(zodProperties);
-    }
-    
-    // Default fallback
-    return z.object({});
-  };
-
-  
 }
