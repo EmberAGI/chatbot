@@ -82,17 +82,26 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
         { capabilities: { tools: {}, resources: {}, prompts: {} } }
       );
     });
-
+    console.log('clients', mcpClients);
     //create an array of transports for each client
-    const transports = serverUrls.map((url) => {
-      return new SSEClientTransport(new URL(url));
-    });
+    let transports = null
+    if (serverUrls) {
+      transports = serverUrls.map((url) => {
+        return new SSEClientTransport(new URL(url));
+      });
+    }
 
+    console.log('transports', transports);
     // Connect to the servers
-    const connections = serverUrls.map((url, index) => {
-      return mcpClients[index].connect(transports[index]);
-    });
-    await Promise.all(connections);
+    if (transports) {
+      const connections = transports.map((url, index) => {
+        return mcpClients[index].connect(transports[index]);
+      });
+      console.log('connections', connections);
+      const resp = await Promise.all(connections);
+      console.log('resp', resp);
+    }
+    
     console.log("MCP clients initialized successfully!");
     // Try to discover tools
     console.log("Attempting to discover tools via MCP clients...");
