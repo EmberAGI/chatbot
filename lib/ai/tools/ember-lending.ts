@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { cookies } from 'next/headers';
+import { chatAgents } from './agents/agents';
 
 /*export const getEmberLending = tool({
   description: 'Get the current weather at a location',
@@ -98,7 +99,17 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
         return mcpClients[index].connect(transports[index]);
       });
       console.log('connections', connections);
-      const resp = await Promise.all(connections);
+      //const resp = await Promise.all(connections);
+      let resp = null
+      try {
+        //resp = await Promise.all(connections);
+        for (const connection of connections) {
+          await connection;
+        }
+      } catch (error) {
+        console.error("Error connecting to servers:", error);
+        resp = [{ status: 'failed' }, { status: 'failed' }]; // Fallback to empty tools array
+      }
       console.log('resp', resp);
     }
     
@@ -144,7 +155,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
         },
       });
       // Add the tool to the accumulator object, using its name as the key
-      acc[`${agentIdFromCookie.value}[${index}] - ${mcptool.name}`] = aiTool;
+      acc[`${chatAgents}${mcptool.name}`] = aiTool;
       return acc;
     }, {} as { [key: string]: CoreTool }); // Initialize with the correct type
 
