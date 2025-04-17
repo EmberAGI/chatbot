@@ -11,6 +11,7 @@ export function ChipToggle({ options, defaultValue, onValueChange }: ChipToggleP
   const [selectedValue, setSelectedValue] = useState<string | undefined>(defaultValue)
 
   const handleSelect = (value: string) => {
+    console.log('val', value)
     setSelectedValue(value)
     onValueChange?.(value)
   }
