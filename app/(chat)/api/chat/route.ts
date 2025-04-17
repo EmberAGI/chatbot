@@ -119,7 +119,7 @@ export async function POST(request: Request) {
                   throw new Error('No assistant message found!');
                 }
 
-                const [, assistantMessage] = appendResponseMessages({
+                const [,assistantMessage] = appendResponseMessages({
                   messages: [userMessage],
                   responseMessages: response.messages,
                 });

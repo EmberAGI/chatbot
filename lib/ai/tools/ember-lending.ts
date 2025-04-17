@@ -121,21 +121,21 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
         description: mcptool.description,
         parameters: convertToZodSchema(mcptool.inputSchema),
         execute: async (args) => {
-          console.log('Executing tool:', mcptool.name);
+          console.log('Executing tool:', agentIdFromCookie.value + ' - ' + mcptool.name);
           console.log('Arguments:', args);
           console.log('MCP Client:', mcpClients);
           const result = await mcpClients[index].callTool({
-            name: mcptool.name,
+            name: agentIdFromCookie.value + ' - ' + mcptool.name,
             arguments: args,
            });
-          console.log('RUNNING TOOL:', mcptool.name);
+          console.log('RUNNING TOOL:', agentIdFromCookie.value + ' - ' + mcptool.name);
           console.log(result);
           const toolResult = {status: 'completed', result: result}
           return toolResult;
         },
       });
       // Add the tool to the accumulator object, using its name as the key
-      acc[mcptool.name] = aiTool;
+      acc[agentIdFromCookie.value + ' - ' + mcptool.name] = aiTool;
       return acc;
     }, {} as { [key: string]: CoreTool }); // Initialize with the correct type
 
