@@ -81,8 +81,11 @@ export async function POST(request: Request) {
       ],
     });
 
+    console.log('Chat ID:', id);
     // Get dynamic tools
     const dynamicTools = await getDynamicTools();
+
+    console.log('Dynamic tools:', dynamicTools);
 
       return createDataStreamResponse({
       execute: (dataStream) => {
