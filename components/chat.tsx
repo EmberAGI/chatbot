@@ -100,6 +100,7 @@ export function Chat({
               messages={messages}
               setMessages={setMessages}
               append={append}
+              selectedAgentId={selectedChatAgent}
             />
           )}
         </form>

@@ -38,6 +38,7 @@ function PureMultimodalInput({
   append,
   handleSubmit,
   className,
+  selectedAgentId,
 }: {
   chatId: string;
   input: UseChatHelpers['input'];
@@ -51,6 +52,7 @@ function PureMultimodalInput({
   append: UseChatHelpers['append'];
   handleSubmit: UseChatHelpers['handleSubmit'];
   className?: string;
+  selectedAgentId: string;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -251,7 +253,7 @@ function PureMultimodalInput({
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
         <AttachmentsButton fileInputRef={fileInputRef} status={'error'} />
-        <AgentSelector selectedAgentId='all'></AgentSelector>
+        <AgentSelector selectedAgentId={selectedAgentId}></AgentSelector>
        
       </div>
 
