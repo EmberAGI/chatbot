@@ -99,7 +99,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
     let toolsResponse;
     try {
       toolsResponse = await Promise.all(mcpClients.map(client => client.listTools()));
-      console.log(toolsResponse);
+      console.log('TR',toolsResponse);
     } catch (error) {
       console.error("Error discovering tools:", error);
       toolsResponse = [{ tools: [] }, { tools: [] }]; // Fallback to empty tools array
@@ -111,9 +111,11 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
         ...toolsResponse[1].tools,
       ],
     };
+
+    console.log(mergedToolsResponse);
     // Use reduce to create an object mapping tool names to AI tools
 
-    const toolObject = mergedToolsResponse.tools.reduce((acc, mcptool) => {
+    const toolObject = mergedToolsResponse.tools.reduce((acc, mcptool, index) => {
       // Convert MCP tool schema to Zod schema
       const aiTool = tool({
         description: mcptool.description,
@@ -122,11 +124,10 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
           console.log('Executing tool:', mcptool.name);
           console.log('Arguments:', args);
           console.log('MCP Client:', mcpClients);
-          const result = await mcpClients[0].callTool({
+          const result = await mcpClients[index].callTool({
             name: mcptool.name,
             arguments: args,
            });
-          //const result = 'chat lending USDC successfully';
           console.log('RUNNING TOOL:', mcptool.name);
           console.log(result);
           const toolResult = {status: 'completed', result: result}
@@ -139,6 +140,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
     }, {} as { [key: string]: CoreTool }); // Initialize with the correct type
 
     // Return the object of tools
+    console.log(toolObject);
     return toolObject;
 
   } else { 
@@ -202,7 +204,8 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
     return acc;
   }, {} as { [key: string]: CoreTool }); // Initialize with the correct type
 
-  // Return the object of tools
+    // Return the object of tools
+    console.log(toolObject);
   return toolObject;
 
   }
