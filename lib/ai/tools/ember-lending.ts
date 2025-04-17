@@ -29,12 +29,16 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   console.log(agentIdFromCookie);
   let serverUrl = ''
 
-  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-lending') {
+  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-aave') {
     serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/sse'; 
   }
 
-  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-test') {
+  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-camelot') {
     serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3011/sse';; 
+  }
+
+  if (agentIdFromCookie && agentIdFromCookie.value === 'all') {
+    serverUrl = process.env.MCP_SERVER_URL || 'http://173.230.139.151:3010/sse'; 
   }
 
 

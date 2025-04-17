@@ -32,7 +32,7 @@ export function AgentSelector({
   );
 
   return (
-    <ChipToggle options={options} defaultValue='all' onValueChange={(value) => {
+    <ChipToggle options={options} defaultValue={optimisticAgentId || 'all'} onValueChange={(value) => {
       console.log(value)
       
         setOptimisticAgentId(value);
