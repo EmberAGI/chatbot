@@ -34,15 +34,6 @@ export function Transaction({
         Cancel Transaction
       </button>
     </div>
-      
-      <div className="flex flex-col gap-2 mt-4">
-        <h3 className="text-lg font-semibold">Transaction Plan</h3>
-        {txPlan?.map((step: any, index: number) => (
-          <div key={index} className="flex flex-row gap-2">
-            <p>{step}</p>
-          </div>
-        ))}
-      </div>
     </div>
   );
   
