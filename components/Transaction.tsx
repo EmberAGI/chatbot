@@ -57,7 +57,9 @@ export function Transaction({
     if (txPlan.length === 1) {
       return;
     } else {
-      signTx(txPlan[0]);
+      if (txPlan.length === 2) {
+        signTx(txPlan[0]);
+      }
     }
   };
 
