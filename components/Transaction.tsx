@@ -30,11 +30,12 @@ export function Transaction({
 
   async function signTx(transaction: any) {
     if (!transaction.to) return;
+    console.log("Transaction", transaction);
     await sendTransactionAsync({
       to: transaction.to,
       data: transaction.data,
       value: toBigInt(transaction.value),
-      chainId: transaction.chainId,
+      chainId: parseInt(transaction.chainId),
     });
   }
 
@@ -94,7 +95,7 @@ export function Transaction({
         <>
           <p>{isSuccess && "Success!"}</p>
           <p>{isPending && "Pending..."}</p>
-          <p>{error && "Error!"}</p>
+          <p>{error && "Error! " + error}</p>
           <div className="flex gap-3">
             {txPlan?.length > 1 && (
               <button
