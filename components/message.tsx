@@ -201,7 +201,7 @@ const PurePreviewMessage = ({
                   console.log(
                     "stringify",
                     JSON.parse(toolInvocation?.result?.result?.content[0]?.text)
-                      ?.artifacts?.parts[0]?.data?.txPreview
+                      ?.artifacts[0]?.parts[0]?.data?.txPreview
                   );
                   return (
                     <div key={toolCallId}>
