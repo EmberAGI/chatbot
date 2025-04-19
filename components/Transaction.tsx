@@ -28,8 +28,7 @@ export function Transaction({
   //useWallet to check if is connected
   const { address, isConnected } = useAccount();
 
-  async function signTx(data: any) {
-    const transaction = parseTransaction(data as `0x${string}`);
+  async function signTx(transaction: any) {
     if (!transaction.to) return;
     await sendTransactionAsync({
       to: transaction.to,
