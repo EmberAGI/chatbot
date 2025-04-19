@@ -207,7 +207,7 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
-                            ) : <Transaction txPreview={result?.artifacts?.parts[0]?.data?.txPreview} txPlan={result?.artifacts?.parts[0]?.data?.txPlan}/>}
+                            ) : <Transaction txPreview={JSON.parse(result?.result?.content?.text)?.artifacts?.parts[0]?.data?.txPreview} txPlan={JSON.parse(result?.result?.content?.text)?.artifacts?.parts[0]?.data?.txPlan}/>}
                     </div>
                   );
                 }
