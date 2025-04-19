@@ -1,5 +1,8 @@
 'use client';
 
+import { parseTransaction } from "viem";
+import { useSendTransaction } from "wagmi";
+
 
 interface txPreview {
   fromToken: string;
@@ -9,13 +12,40 @@ interface txPreview {
   toChain: string;
 }
 
+function toBigInt(value: string | number | boolean | bigint | undefined) {
+  return value ? BigInt(value) : undefined;
+}
+
+
 export function Transaction({
   txPreview,
   txPlan
 }: {
   txPreview: any;
   txPlan: any;
-}){
+  }) {
+  const {
+  data: hash,
+  error,
+  isPending,
+  isSuccess,
+  sendTransactionAsync,
+  } = useSendTransaction();
+  console.log(hash)
+  
+async function signTransaction(data: any) {
+  if (!data || !data.transaction_info || !data.transaction_info.transaction)
+    return;
+  const transaction = parseTransaction(
+    data.transaction_info.transaction as `0x${string}`
+  );
+  if (!transaction.to) return;
+  await sendTransactionAsync({
+    to: transaction.to,
+    data: transaction.data,
+    value: toBigInt(transaction.value),
+  });
+}
 
   return (
     //Create a transaction preview card that displays the transaction details
