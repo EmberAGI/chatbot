@@ -65,16 +65,30 @@ export function Transaction({
     <div className="flex flex-col gap-2 p-4 bg-white shadow-md rounded-lg text-gray-900">
       <h2 className="text-lg font-semibold">Transaction Preview</h2>
 
-      <div className="flex gap 2">
-        <p>From: {txPreview?.fromToken}</p>
-        <p>To: {txPreview?.toToken}</p>
+      <div className="flex gap-2">
+        <p className="font-semibold">
+          From: <span className="font-normal">{txPreview?.fromToken}</span>
+        </p>
+        <p className="font-semibold">
+          To: <span className="font-normal">{txPreview?.toToken}</span>
+        </p>
       </div>
-      <div className="flex gap 2">
-        <p>From Chain: {txPreview?.fromChain}</p>
-        <p>To Chain: {txPreview?.toChain}</p>
+      <div className="flex gap-2">
+        <p className="font-semibold">
+          From Chain:{" "}
+          <span className="font-normal">{txPreview?.fromChain}</span>
+        </p>
+        <p className="font-semibold">
+          To Chain: <span className="font-normal">{txPreview?.toChain}</span>
+        </p>
       </div>
 
-      <p>Amount: {txPreview?.amount}</p>
+      <p className="font-semibold">
+        Amount:{" "}
+        <span className="font-normal">
+          {txPreview?.amount} {txPreview?.fromToken}
+        </span>
+      </p>
 
       {isConnected ? (
         <>
