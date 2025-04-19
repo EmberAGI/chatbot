@@ -19,6 +19,7 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import { UseChatHelpers } from '@ai-sdk/react';
+import { Transaction } from './Transaction';
 
 const PurePreviewMessage = ({
   chatId,
@@ -158,7 +159,7 @@ const PurePreviewMessage = ({
                     <div
                       key={toolCallId}
                       className={cx({
-                        skeleton: ['getWeather'].includes(toolName),
+                        skeleton: ['getWeather'].includes(toolName) || ['askSwapAgent'].includes(toolName),
                       })}
                     >
                       {toolName === 'getWeather' ? (
@@ -177,7 +178,7 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
-                      ) : <div>Tool: {toolName}</div>}
+                      ) : <Transaction txPreview={null} txPlan={null}/>}
                     </div>
                   );
                 }
@@ -206,7 +207,7 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
-                      ) : null}
+                            ) : <Transaction txPreview={result?.artifacts?.parts[0]?.data?.txPreview} txPlan={result?.artifacts?.parts[0]?.data?.txPlan}/>}
                     </div>
                   );
                 }
