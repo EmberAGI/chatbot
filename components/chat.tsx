@@ -13,6 +13,23 @@ import { Messages } from './messages';
 import { VisibilityType } from './visibility-selector';
 import { useArtifactSelector } from '@/hooks/use-artifact';
 import { toast } from 'sonner';
+import '@rainbow-me/rainbowkit/styles.css';
+import {
+  getDefaultConfig,
+  RainbowKitProvider,
+} from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
+import {
+  mainnet,
+  polygon,
+  optimism,
+  arbitrum,
+  base,
+} from 'wagmi/chains';
+import {
+  QueryClientProvider,
+  QueryClient,
+} from "@tanstack/react-query";
 
 export function Chat({
   id,
@@ -28,7 +45,16 @@ export function Chat({
   selectedVisibilityType: VisibilityType;
     isReadonly: boolean;
     selectedChatAgent: string;
-}) {
+  }) {
+  
+    const config = getDefaultConfig({
+      appName: 'My RainbowKit App',
+      projectId: 'YOUR_PROJECT_ID',
+      chains: [mainnet, polygon, optimism, arbitrum, base],
+      ssr: true, // If your dApp uses server side rendering (SSR)
+    });
+  const queryClient = new QueryClient();
+  
   const { mutate } = useSWRConfig();
 
   const {
@@ -66,6 +92,9 @@ export function Chat({
 
   return (
     <>
+      <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
         <ChatHeader
           chatId={id}
@@ -122,7 +151,10 @@ export function Chat({
         votes={votes}
         isReadonly={isReadonly}
         selectedAgentId={selectedChatAgent}
-      />
+          />
+          </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
     </>
   );
 }
