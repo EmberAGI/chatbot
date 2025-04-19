@@ -231,7 +231,7 @@ const PurePreviewMessage = ({
                               ? JSON.parse(
                                   toolInvocation?.result?.result?.content[0]
                                     ?.text
-                                )?.artifacts?.parts[0]?.data?.txPreview
+                                )?.artifacts[0]?.parts[0]?.data?.txPreview
                               : null
                           }
                           txPlan={
@@ -239,7 +239,7 @@ const PurePreviewMessage = ({
                               ? JSON.parse(
                                   toolInvocation?.result?.result?.content[0]
                                     ?.text
-                                )?.artifacts?.parts[0]?.data?.txPlan
+                                )?.artifacts[0]?.parts[0]?.data?.txPlan
                               : null
                           }
                         />
