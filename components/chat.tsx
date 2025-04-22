@@ -1,35 +1,28 @@
-'use client';
+"use client";
 
-import type { Attachment, UIMessage } from 'ai';
-import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
-import { ChatHeader } from '@/components/chat-header';
-import type { Vote } from '@/lib/db/schema';
-import { fetcher, generateUUID } from '@/lib/utils';
-import { Artifact } from './artifact';
-import { MultimodalInput } from './multimodal-input';
-import { Messages } from './messages';
-import { VisibilityType } from './visibility-selector';
-import { useArtifactSelector } from '@/hooks/use-artifact';
-import { toast } from 'sonner';
-import '@rainbow-me/rainbowkit/styles.css';
+import type { Attachment, UIMessage } from "ai";
+import { useChat } from "@ai-sdk/react";
+import { useState } from "react";
+import useSWR, { useSWRConfig } from "swr";
+import { ChatHeader } from "@/components/chat-header";
+import type { Vote } from "@/lib/db/schema";
+import { fetcher, generateUUID } from "@/lib/utils";
+import { Artifact } from "./artifact";
+import { MultimodalInput } from "./multimodal-input";
+import { Messages } from "./messages";
+import { VisibilityType } from "./visibility-selector";
+import { useArtifactSelector } from "@/hooks/use-artifact";
+import { toast } from "sonner";
+import "@rainbow-me/rainbowkit/styles.css";
+import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import {
-  getDefaultConfig,
-  RainbowKitProvider,
-} from '@rainbow-me/rainbowkit';
-import { WagmiProvider } from 'wagmi';
-import {
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
-} from 'wagmi/chains';
-import {
-  QueryClientProvider,
-  QueryClient,
-} from "@tanstack/react-query";
+  cookieStorage,
+  cookieToInitialState,
+  createStorage,
+  WagmiProvider,
+} from "wagmi";
+import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 export function Chat({
   id,
@@ -43,19 +36,21 @@ export function Chat({
   initialMessages: Array<UIMessage>;
   selectedChatModel: string;
   selectedVisibilityType: VisibilityType;
-    isReadonly: boolean;
-    selectedChatAgent: string;
-  }) {
-  
-    const config = getDefaultConfig({
-      appName: 'My RainbowKit App',
-      projectId: 'YOUR_PROJECT_ID',
-      chains: [mainnet, polygon, optimism, arbitrum, base],
-      ssr: true, // If your dApp uses server side rendering (SSR)
-    });
+  isReadonly: boolean;
+  selectedChatAgent: string;
+}) {
+  const config = getDefaultConfig({
+    appName: "My RainbowKit App",
+    projectId: "YOUR_PROJECT_ID",
+    chains: [mainnet, polygon, optimism, arbitrum, base],
+    ssr: true, // If your dApp uses server side rendering (SSR)
+    storage: createStorage({ storage: cookieStorage }),
+  });
   const queryClient = new QueryClient();
-  
+
   const { mutate } = useSWRConfig();
+  const cookie = cookieStorage.getItem("wagmi.storage") || "";
+  const initialState = cookieToInitialState(config, cookie);
 
   const {
     messages,
@@ -75,16 +70,16 @@ export function Chat({
     sendExtraMessageFields: true,
     generateId: generateUUID,
     onFinish: () => {
-      mutate('/api/history');
+      mutate("/api/history");
     },
     onError: () => {
-      toast.error('An error occured, please try again!');
+      toast.error("An error occured, please try again!");
     },
   });
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
-    fetcher,
+    fetcher
   );
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
@@ -92,32 +87,50 @@ export function Chat({
 
   return (
     <>
-      <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-      <div className="flex flex-col min-w-0 h-dvh bg-background">
-        <ChatHeader
-          chatId={id}
-          selectedModelId={selectedChatModel}
-          selectedVisibilityType={selectedVisibilityType}
-          isReadonly={isReadonly}
-          selectedAgentId={selectedChatAgent}
-        />
+      <WagmiProvider config={config} initialState={initialState}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider>
+            <div className="flex flex-col min-w-0 h-dvh bg-background">
+              <ChatHeader
+                chatId={id}
+                selectedModelId={selectedChatModel}
+                selectedVisibilityType={selectedVisibilityType}
+                isReadonly={isReadonly}
+                selectedAgentId={selectedChatAgent}
+              />
 
-        <Messages
-          chatId={id}
-          status={status}
-          votes={votes}
-          messages={messages}
-          setMessages={setMessages}
-          reload={reload}
-          isReadonly={isReadonly}
-          isArtifactVisible={isArtifactVisible}
-        />
+              <Messages
+                chatId={id}
+                status={status}
+                votes={votes}
+                messages={messages}
+                setMessages={setMessages}
+                reload={reload}
+                isReadonly={isReadonly}
+                isArtifactVisible={isArtifactVisible}
+              />
 
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
-          {!isReadonly && (
-            <MultimodalInput
+              <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
+                {!isReadonly && (
+                  <MultimodalInput
+                    chatId={id}
+                    input={input}
+                    setInput={setInput}
+                    handleSubmit={handleSubmit}
+                    status={status}
+                    stop={stop}
+                    attachments={attachments}
+                    setAttachments={setAttachments}
+                    messages={messages}
+                    setMessages={setMessages}
+                    append={append}
+                    selectedAgentId={selectedChatAgent}
+                  />
+                )}
+              </form>
+            </div>
+
+            <Artifact
               chatId={id}
               input={input}
               setInput={setInput}
@@ -126,35 +139,17 @@ export function Chat({
               stop={stop}
               attachments={attachments}
               setAttachments={setAttachments}
+              append={append}
               messages={messages}
               setMessages={setMessages}
-              append={append}
+              reload={reload}
+              votes={votes}
+              isReadonly={isReadonly}
               selectedAgentId={selectedChatAgent}
             />
-          )}
-        </form>
-      </div>
-
-      <Artifact
-        chatId={id}
-        input={input}
-        setInput={setInput}
-        handleSubmit={handleSubmit}
-        status={status}
-        stop={stop}
-        attachments={attachments}
-        setAttachments={setAttachments}
-        append={append}
-        messages={messages}
-        setMessages={setMessages}
-        reload={reload}
-        votes={votes}
-        isReadonly={isReadonly}
-        selectedAgentId={selectedChatAgent}
-          />
           </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </>
   );
 }
