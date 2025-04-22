@@ -203,6 +203,11 @@ const PurePreviewMessage = ({
                     JSON.parse(toolInvocation?.result?.result?.content[0]?.text)
                       ?.artifacts[0]?.parts[0]?.data?.txPreview
                   );
+                  const stringify = toolInvocation?.result?.result?.content
+                    ? JSON.parse(
+                        toolInvocation?.result?.result?.content[0]?.text
+                      )
+                    : null;
                   return (
                     <div key={toolCallId}>
                       {toolName === "getWeather" ? (
@@ -227,7 +232,10 @@ const PurePreviewMessage = ({
                       ) : (
                         <Transaction
                           txPreview={
-                            toolInvocation?.result?.result?.content[0]?.text
+                            stringify &&
+                            stringify?.artifacts &&
+                            stringify?.artifacts[0]?.parts &&
+                            stringify?.artifacts[0]?.parts[0]?.data
                               ? JSON.parse(
                                   toolInvocation?.result?.result?.content[0]
                                     ?.text
@@ -235,7 +243,10 @@ const PurePreviewMessage = ({
                               : null
                           }
                           txPlan={
-                            toolInvocation?.result?.result?.content[0]?.text
+                            stringify &&
+                            stringify?.artifacts &&
+                            stringify?.artifacts[0]?.parts &&
+                            stringify?.artifacts[0]?.parts[0]?.data
                               ? JSON.parse(
                                   toolInvocation?.result?.result?.content[0]
                                     ?.text
