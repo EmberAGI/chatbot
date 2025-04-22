@@ -198,11 +198,7 @@ const PurePreviewMessage = ({
                     "stringify",
                     JSON.parse(toolInvocation?.result?.result?.content[0]?.text)
                   );
-                  console.log(
-                    "stringify",
-                    JSON.parse(toolInvocation?.result?.result?.content[0]?.text)
-                      ?.artifacts[0]?.parts[0]?.data?.txPreview
-                  );
+
                   const stringify = toolInvocation?.result?.result?.content
                     ? JSON.parse(
                         toolInvocation?.result?.result?.content[0]?.text

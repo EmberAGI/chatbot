@@ -41,7 +41,7 @@ export function Chat({
 }) {
   const config = getDefaultConfig({
     appName: "My RainbowKit App",
-    projectId: "YOUR_PROJECT_ID",
+    projectId: "4b49e5e63b9f6253943b470873b47208",
     chains: [mainnet, polygon, optimism, arbitrum, base],
     ssr: true, // If your dApp uses server side rendering (SSR)
     storage: createStorage({ storage: cookieStorage }),
@@ -87,7 +87,11 @@ export function Chat({
 
   return (
     <>
-      <WagmiProvider config={config} initialState={initialState}>
+      <WagmiProvider
+        config={config}
+        reconnectOnMount={true}
+        initialState={initialState}
+      >
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <div className="flex flex-col min-w-0 h-dvh bg-background">
