@@ -36,14 +36,21 @@ export const regularPrompt =
 
 export const systemPrompt = ({
   selectedChatModel,
+  walletAddress,
 }: {
   selectedChatModel: string;
+  walletAddress?: string;
 }) => {
-  if (selectedChatModel === 'chat-model-reasoning') {
-    return regularPrompt;
-  } else {
-    return `${regularPrompt}\n\n${artifactsPrompt}`;
+  let basePrompt = regularPrompt;
+  if (selectedChatModel !== 'chat-model-reasoning') {
+    basePrompt += `\n\n${artifactsPrompt}`;
   }
+
+  if (walletAddress) {
+    basePrompt += `\n\nThe user's wallet address is: ${walletAddress}`;
+  }
+
+  return basePrompt;
 };
 
 export const codePrompt = `
