@@ -27,6 +27,12 @@ import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
+
+const ContextSchema = z.object({
+  walletAddress: z.string().optional(),
+});
+type Context = z.infer<typeof ContextSchema>;
 
 export const maxDuration = 60;
 
@@ -36,11 +42,26 @@ export async function POST(request: Request) {
       id,
       messages,
       selectedChatModel,
+      context,
     }: {
       id: string;
       messages: Array<UIMessage>;
       selectedChatModel: string;
+      context: Context;
     } = await request.json();
+
+    const validationResult = ContextSchema.safeParse(context);
+
+    if (!validationResult.success) {
+      return new Response(JSON.stringify(validationResult.error.errors), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    const validatedContext = validationResult.data;
 
     const session = await auth();
 
@@ -91,7 +112,10 @@ export async function POST(request: Request) {
       execute: (dataStream) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
+          system: systemPrompt({ 
+            selectedChatModel, 
+            walletAddress: validatedContext.walletAddress 
+          }),
           messages,
           maxSteps: 20,
           experimental_transform: smoothStream({ chunking: 'word' }),
