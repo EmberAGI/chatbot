@@ -123,15 +123,21 @@ export function Transaction({
 
           {isConnected ? (
             <>
-              <p className=" p-2 rounded-r-2xl border-green-800 bg-green-200 w-full border-2">
-                {isSuccess && "Success!"}
-              </p>
-              <p className=" p-2 rounded-r-2xl border-gray-400 bg-gray-200 w-full border-2">
-                {isPending && "Pending..."}
-              </p>
-              <p className=" p-2 rounded-r-2xl border-red-800 bg-red-400 w-full border-2">
-                {error && "Error! " + error}
-              </p>
+              {isSuccess && (
+                <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
+                  {isSuccess && "Success!"}
+                </p>
+              )}
+              {isPending && (
+                <p className=" p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2 text-slate-800">
+                  {isPending && "Pending..."}
+                </p>
+              )}
+              {error && (
+                <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white">
+                  {error && "Error! " + error}
+                </p>
+              )}
               <div className="flex gap-3">
                 {txPlan?.length > 1 && (
                   <button
@@ -152,7 +158,7 @@ export function Transaction({
               </div>
             </>
           ) : (
-            <p className="text-red-500 p-2 rounded-r-2xl border-gray-400 bg-gray-200 w-full border-2">
+            <p className="text-red-500 p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
               Please connect your wallet
             </p>
           )}
