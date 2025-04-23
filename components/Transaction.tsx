@@ -74,13 +74,15 @@ export function Transaction({
             <p className="font-semibold">
               From:{" "}
               <span className="font-normal">
-                {txPreview?.fromToken && txPreview?.fromToken.toUpperCase()}
+                {txPreview?.fromTokenSymbol &&
+                  txPreview?.fromTokenSymbol.toUpperCase()}
               </span>
             </p>
             <p className="font-semibold">
               To:{" "}
               <span className="font-normal">
-                {txPreview?.toToken && txPreview?.toToken.toUpperCase()}
+                {txPreview?.toTokenSymbol &&
+                  txPreview?.toTokenSymbol.toUpperCase()}
               </span>
             </p>
           </div>
@@ -98,9 +100,25 @@ export function Transaction({
           <p className="font-semibold">
             Amount:{" "}
             <span className="font-normal">
-              {txPreview?.amount}{" "}
-              {txPreview?.fromToken && txPreview?.fromToken.toUpperCase()}
+              {txPreview?.fromTokenAmount}{" "}
+              {txPreview?.fromTokenAmount &&
+                txPreview?.fromTokenSymbol.toUpperCase() + " to "}
             </span>
+            <span className="font-normal">
+              {txPreview?.toTokenAmount}{" "}
+              {txPreview?.toTokenAmount &&
+                txPreview?.toTokenSymbol.toUpperCase()}
+            </span>
+            {/* horizontal divider */}
+            <div className="border-t border-gray-300 my-2"></div>
+            <a
+              href={txPreview?.explorerUrl}
+              target="_blank"
+              rel="noopener noreferer"
+              className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+            >
+              Explore
+            </a>
           </p>
 
           {isConnected ? (

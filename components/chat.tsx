@@ -2,7 +2,7 @@
 
 import type { Attachment, UIMessage } from "ai";
 import { useChat } from "@ai-sdk/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { ChatHeader } from "@/components/chat-header";
 import type { Vote } from "@/lib/db/schema";
@@ -46,11 +46,14 @@ export function Chat({
     ssr: true, // If your dApp uses server side rendering (SSR)
     storage: createStorage({ storage: cookieStorage }),
   });
-  const queryClient = new QueryClient();
+
+  useEffect(() => {
+    const queryClient = new QueryClient();
+    const cookie = cookieStorage.getItem("wagmi.storage") || "";
+    const initialState = cookieToInitialState(config, cookie);
+  }, [id, config]);
 
   const { mutate } = useSWRConfig();
-  const cookie = cookieStorage.getItem("wagmi.storage") || "";
-  const initialState = cookieToInitialState(config, cookie);
 
   const {
     messages,
