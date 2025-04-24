@@ -1,53 +1,59 @@
 "use client";
 
 import {
-  parseTransaction,
   createPublicClient,
   http,
   parseUnits,
-  type PublicClient,
   type Hex,
+  type Chain,
 } from "viem";
-import { useAccount, useSendTransaction } from "wagmi";
-import { mainnet } from "viem/chains";
-
-interface txPreview {
-  fromToken: string;
-  toToken: string;
-  amount: string;
-  fromChain: string;
-  toChain: string;
-}
-
-function toBigInt(value: string | number | boolean | bigint | undefined) {
-  return value ? BigInt(value) : undefined;
-}
+import { useAccount, useSendTransaction, useSwitchChain } from "wagmi";
+// Import all chains from viem/chains - BEWARE of bundle size impact!
+import * as allViemChains from "viem/chains";
 
 // === global tuning parameters ===
 const GAS_LIMIT_BUFFER_PCT = 120n; // 120% → +20%
 const LEGACY_GAS_PRICE_BUFFER_PCT = 120n; // 120% → +20%
 const DEFAULT_PRIORITY_FEE_GWEI = "1.5"; // 1.5 gwei
 
-// initialize public client for gas estimation
-const publicClient = createPublicClient({
-  chain: mainnet,
-  transport: http(),
-});
+// --- Helper to get viem chain object from ID ---
+// Note: This imports all chains from viem, potentially increasing bundle size.
+// Consider manually importing only supported chains if bundle size is critical.
+function getChainById(chainId: number): Chain | undefined {
+  // Convert the imported chains object into an array of Chain objects
+  const chainsArray = Object.values(allViemChains);
+  // Find the chain where the id matches the requested chainId
+  return chainsArray.find((chain) => chain.id === chainId);
+}
 
 /**
- * Given a bare tx, returns gas overrides with safe defaults
+ * Given a bare tx and chainId, returns gas overrides with safe defaults
  */
 async function withSafeDefaults(
-  client: PublicClient,
+  chainId: number,
   tx: { to: Hex; data: Hex; value?: bigint }
 ) {
+  const chain = getChainById(chainId);
+  if (!chain) {
+    // Add specific error handling if a chain isn't found in the imported list
+    console.error(`Chain with ID ${chainId} not found in viem/chains import.`);
+    throw new Error(`Unsupported or unknown chainId: ${chainId}`);
+  }
+  const client = createPublicClient({
+    chain: chain,
+    transport: http(),
+  });
+
   const estimated = await client.estimateGas(tx);
   const gasLimit = (estimated * GAS_LIMIT_BUFFER_PCT) / 100n;
   const block = await client.getBlock({ blockTag: "latest" });
-  if (block.baseFeePerGas !== null) {
+
+  // Check for EIP-1559 support correctly based on block base fee
+  if (block.baseFeePerGas !== null && block.baseFeePerGas !== undefined) {
     // EIP-1559 chain
     const baseFee = block.baseFeePerGas;
     const priority = parseUnits(DEFAULT_PRIORITY_FEE_GWEI, 9);
+    // Ensure baseFee isn't extremely low, add buffer logic if necessary
     const maxFee = baseFee * 2n + priority;
     return {
       gas: gasLimit,
@@ -55,7 +61,7 @@ async function withSafeDefaults(
       maxFeePerGas: maxFee,
     };
   } else {
-    // legacy chain
+    // Legacy chain (or chain where baseFeePerGas is null)
     const gasPrice = await client.getGasPrice();
     return {
       gas: gasLimit,
@@ -73,50 +79,93 @@ export function Transaction({
 }) {
   const { data, error, isPending, isSuccess, sendTransactionAsync } =
     useSendTransaction();
-
-  //useWallet to check if is connected
-  const { address, isConnected } = useAccount();
+  // Get current chainId from useAccount
+  const { address, isConnected, chainId: currentChainId } = useAccount();
+  // Get switchChain function
+  const { switchChainAsync } = useSwitchChain();
 
   async function signTx(transaction: any) {
-    if (!transaction.to) return;
-    // prepare base tx
-    const txBase = {
-      to: transaction.to as Hex,
-      data: transaction.data as Hex,
-      value: toBigInt(transaction.value),
-    };
-    // compute gas overrides
-    const overrides = await withSafeDefaults(publicClient, txBase);
-    console.log("Transaction", { ...txBase, ...overrides });
-    await sendTransactionAsync({
-      ...txBase,
-      chainId: parseInt(transaction.chainId),
-      ...overrides,
-    });
+    if (
+      !transaction.to ||
+      !isConnected ||
+      !currentChainId ||
+      !switchChainAsync
+    ) {
+      console.error(
+        "Prerequisites not met for signing: Check connection, chainId, or switchChain availability."
+      );
+      return;
+    }
+
+    const requiredChainId = parseInt(transaction.chainId);
+    if (isNaN(requiredChainId)) {
+      console.error("Invalid required chainId:", transaction.chainId);
+      return;
+    }
+
+    try {
+      // --- Network Switching Logic ---
+      if (currentChainId !== requiredChainId) {
+        console.log(
+          `Switching network from ${currentChainId} to ${requiredChainId}`
+        );
+        await switchChainAsync({ chainId: requiredChainId });
+        // After switchChainAsync resolves, wagmi's internal state
+        // and the value from useAccount() should update automatically,
+        // so sendTransactionAsync below will use the new chain.
+        // Add a small delay or check if necessary, though often not needed.
+        console.log(`Network switch to ${requiredChainId} requested.`);
+      }
+      // --- End Network Switching Logic ---
+
+      // Prepare base tx
+      const txBase = {
+        to: transaction.to as Hex,
+        data: transaction.data as Hex,
+        value: toBigInt(transaction.value),
+      };
+
+      // Compute gas overrides (uses the REQUIRED chainId for calculation)
+      const overrides = await withSafeDefaults(requiredChainId, txBase);
+      console.log("Transaction Details:", {
+        ...txBase,
+        ...overrides,
+        chainId: requiredChainId,
+      });
+
+      // Send transaction - wagmi uses the currently connected chain
+      // (which should now be requiredChainId after potential switch)
+      await sendTransactionAsync({
+        ...txBase,
+        // No explicit chainId needed here
+        ...overrides,
+      });
+      console.log("Transaction sent via sendTransactionAsync");
+    } catch (err: any) {
+      // Catch potential errors from switchChainAsync or sendTransactionAsync
+      console.error("Error during network switch or transaction sending:", err);
+      // Handle specific errors if needed (e.g., user rejected switch)
+      if (err.code === 4001) {
+        // Standard EIP-1193 user rejected request error
+        console.log("User rejected the network switch or transaction.");
+      }
+      // Update UI state to show the error
+    }
   }
 
-  const signTransaction = () => {
+  const signMainTransaction = () => {
     if (!txPlan) return;
-    if (txPlan.length === 1) {
-      const transaction = txPlan[0];
-      signTx(transaction);
-    } else {
-      // Handle multiple transactions
-      for (const transaction of txPlan) {
-        signTx(transaction);
-      }
-    }
+    const transaction = txPlan[txPlan.length - 1];
+    signTx(transaction);
   };
 
   const approveTransaction = () => {
-    if (!txPlan) return;
-    if (txPlan.length === 1) {
+    if (!txPlan || txPlan.length <= 1) {
+      console.log("No approval step needed or txPlan invalid.");
       return;
-    } else {
-      if (txPlan.length === 2) {
-        signTx(txPlan[0]);
-      }
     }
+    const approvalTransaction = txPlan[0];
+    signTx(approvalTransaction);
   };
 
   return (
@@ -191,25 +240,29 @@ export function Transaction({
               )}
               {error && (
                 <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white">
-                  {error && "Error! " + error}
+                  Error! {error.message || JSON.stringify(error, null, 2)}
                 </p>
               )}
               <div className="flex gap-3">
                 {txPlan?.length > 1 && (
                   <button
-                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded disabled:opacity-50"
                     type="button"
-                    onClick={() => approveTransaction()}
+                    onClick={approveTransaction}
+                    disabled={isPending}
                   >
                     Approve Transaction
                   </button>
                 )}
                 <button
-                  className="mt-4 bg-red-500 text-white py-2 px-4 rounded"
+                  className="mt-4 bg-red-500 text-white py-2 px-4 rounded disabled:opacity-50"
                   type="button"
-                  onClick={() => signTransaction()}
+                  onClick={signMainTransaction}
+                  disabled={isPending}
                 >
-                  Sign Transaction
+                  {txPlan?.length > 1
+                    ? "Execute Transaction"
+                    : "Sign Transaction"}
                 </button>
               </div>
             </>
@@ -222,4 +275,17 @@ export function Transaction({
       )}
     </>
   );
+}
+
+// Added a helper function to convert values to BigInt safely
+function toBigInt(
+  value: string | number | boolean | bigint | undefined
+): bigint | undefined {
+  if (value === undefined || value === null) return undefined;
+  try {
+    return BigInt(value);
+  } catch (e) {
+    console.error("Failed to convert value to BigInt:", value, e);
+    return undefined;
+  }
 }
