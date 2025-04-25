@@ -27,7 +27,6 @@ import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
 import { cookies } from 'next/headers';
-import { Session } from 'next-auth';
 
 export const maxDuration = 60;
 
@@ -43,17 +42,8 @@ export async function POST(request: Request) {
       selectedChatModel: string;
     } = await request.json();
 
-    //const session = await auth();
+    const session = await auth();
 
-    //mock auth session object
-    // const session = await auth();
-    const session: Session = {
-
-
-
-    
-
-   
     if (!session || !session.user || !session.user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
@@ -186,11 +176,7 @@ export async function DELETE(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  //const session = await auth();
-  const session: Session = {
-    user: { id: "123" },
-    expires: "",
-  };
+  const session = await auth();
 
   if (!session || !session.user) {
     return new Response('Unauthorized', { status: 401 });
