@@ -27,6 +27,7 @@ import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
 import { cookies } from 'next/headers';
+import { Session } from 'next-auth';
 
 export const maxDuration = 60;
 
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
       selectedChatModel: string;
     } = await request.json();
 
-    const session = await auth();
+    const session : Session | null = await auth();
 
     if (!session || !session.user || !session.user.id) {
       return new Response('Unauthorized', { status: 401 });
