@@ -13,6 +13,7 @@ import { Messages } from "./messages";
 import { VisibilityType } from "./visibility-selector";
 import { useArtifactSelector } from "@/hooks/use-artifact";
 import { toast } from "sonner";
+import { useAccount } from "wagmi";
 
 export function Chat({
   id,
@@ -30,6 +31,7 @@ export function Chat({
   selectedChatAgent: string;
 }) {
   const { mutate } = useSWRConfig();
+  const { address } = useAccount();
 
   const {
     messages,
@@ -43,7 +45,13 @@ export function Chat({
     reload,
   } = useChat({
     id,
-    body: { id, selectedChatModel: selectedChatModel },
+    body: {
+      id,
+      selectedChatModel,
+      context: {
+        walletAddress: address,
+      },
+    },
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
