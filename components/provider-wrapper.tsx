@@ -1,7 +1,11 @@
 "use client";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import {
+  darkTheme,
+  getDefaultConfig,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
 import {
   cookieStorage,
   cookieToInitialState,
@@ -33,7 +37,14 @@ export function ProviderWrapper({ children }: { children: React.ReactNode }) {
         initialState={initialState}
       >
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider>{children}</RainbowKitProvider>
+          <RainbowKitProvider
+            theme={darkTheme({
+              accentColor: "#FF7224",
+              accentColorForeground: "#fff",
+            })}
+          >
+            {children}
+          </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </>

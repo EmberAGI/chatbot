@@ -44,11 +44,16 @@ export async function POST(request: Request) {
     } = await request.json();
 
     //const session = await auth();
-    const session: Session = {
-      user: { id: "123" },
-      expires: "",
-    };
 
+    //mock auth session object
+    // const session = await auth();
+    const session: Session = {
+
+
+
+    
+
+   
     if (!session || !session.user || !session.user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
