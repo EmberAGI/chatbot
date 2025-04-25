@@ -1,7 +1,15 @@
 "use client";
 
-import { parseTransaction } from "viem";
+import {
+  parseTransaction,
+  createPublicClient,
+  http,
+  parseUnits,
+  type PublicClient,
+  type Hex,
+} from "viem";
 import { useAccount, useSendTransaction } from "wagmi";
+import { mainnet } from "viem/chains";
 
 interface txPreview {
   fromToken: string;
@@ -13,6 +21,47 @@ interface txPreview {
 
 function toBigInt(value: string | number | boolean | bigint | undefined) {
   return value ? BigInt(value) : undefined;
+}
+
+// === global tuning parameters ===
+const GAS_LIMIT_BUFFER_PCT = 120n; // 120% → +20%
+const LEGACY_GAS_PRICE_BUFFER_PCT = 120n; // 120% → +20%
+const DEFAULT_PRIORITY_FEE_GWEI = "1.5"; // 1.5 gwei
+
+// initialize public client for gas estimation
+const publicClient = createPublicClient({
+  chain: mainnet,
+  transport: http(),
+});
+
+/**
+ * Given a bare tx, returns gas overrides with safe defaults
+ */
+async function withSafeDefaults(
+  client: PublicClient,
+  tx: { to: Hex; data: Hex; value?: bigint }
+) {
+  const estimated = await client.estimateGas(tx);
+  const gasLimit = (estimated * GAS_LIMIT_BUFFER_PCT) / 100n;
+  const block = await client.getBlock({ blockTag: "latest" });
+  if (block.baseFeePerGas !== null) {
+    // EIP-1559 chain
+    const baseFee = block.baseFeePerGas;
+    const priority = parseUnits(DEFAULT_PRIORITY_FEE_GWEI, 9);
+    const maxFee = baseFee * 2n + priority;
+    return {
+      gas: gasLimit,
+      maxPriorityFeePerGas: priority,
+      maxFeePerGas: maxFee,
+    };
+  } else {
+    // legacy chain
+    const gasPrice = await client.getGasPrice();
+    return {
+      gas: gasLimit,
+      gasPrice: (gasPrice * LEGACY_GAS_PRICE_BUFFER_PCT) / 100n,
+    };
+  }
 }
 
 export function Transaction({
@@ -30,12 +79,19 @@ export function Transaction({
 
   async function signTx(transaction: any) {
     if (!transaction.to) return;
-    console.log("Transaction", transaction);
-    await sendTransactionAsync({
-      to: transaction.to,
-      data: transaction.data,
+    // prepare base tx
+    const txBase = {
+      to: transaction.to as Hex,
+      data: transaction.data as Hex,
       value: toBigInt(transaction.value),
+    };
+    // compute gas overrides
+    const overrides = await withSafeDefaults(publicClient, txBase);
+    console.log("Transaction", { ...txBase, ...overrides });
+    await sendTransactionAsync({
+      ...txBase,
       chainId: parseInt(transaction.chainId),
+      ...overrides,
     });
   }
 
