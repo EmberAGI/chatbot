@@ -1,25 +1,31 @@
-"use client"
-import { useState } from "react"
+"use client";
+import { useState } from "react";
 
 interface ChipToggleProps {
-  options: { value: string; label: string }[]
-  defaultValue?: string
-  onValueChange?: (value: string) => void
+  options: { value: string; label: string }[];
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
 }
 
-export function ChipToggle({ options, defaultValue, onValueChange }: ChipToggleProps) {
-  const [selectedValue, setSelectedValue] = useState<string | undefined>(defaultValue)
+export function ChipToggle({
+  options,
+  defaultValue,
+  onValueChange,
+}: ChipToggleProps) {
+  const [selectedValue, setSelectedValue] = useState<string | undefined>(
+    defaultValue
+  );
 
   const handleSelect = (value: string) => {
-    console.log('val', value)
-    setSelectedValue(value)
-    onValueChange?.(value)
-  }
+    console.log("val", value);
+    setSelectedValue(value);
+    onValueChange?.(value);
+  };
 
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((option) => {
-        const isSelected = selectedValue === option.value
+        const isSelected = selectedValue === option.value;
         return (
           <button
             key={option.value}
@@ -28,13 +34,17 @@ export function ChipToggle({ options, defaultValue, onValueChange }: ChipToggleP
             className={`
               rounded-full px-4 py-2 text-sm font-medium transition-colors
               border border-gray-200 
-              ${isSelected ? "bg-white text-gray-700" : " bg-gray-900 text-white hover:bg-gray-100"}
+              ${
+                isSelected
+                  ? "bg-orange-500 text-white"
+                  : " bg-gray-900 text-white hover:bg-gray-100"
+              }
             `}
           >
             {option.label}
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
