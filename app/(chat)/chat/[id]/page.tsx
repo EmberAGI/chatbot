@@ -1,13 +1,14 @@
-import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
-import { auth } from '@/app/(auth)/auth';
-import { Chat } from '@/components/chat';
-import { getChatById, getMessagesByChatId } from '@/lib/db/queries';
-import { DataStreamHandler } from '@/components/data-stream-handler';
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import { DBMessage } from '@/lib/db/schema';
-import { Attachment, UIMessage } from 'ai';
+import { auth } from "@/app/(auth)/auth";
+import { Chat } from "@/components/chat";
+import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
+import { DataStreamHandler } from "@/components/data-stream-handler";
+import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { DBMessage } from "@/lib/db/schema";
+import { Attachment, UIMessage } from "ai";
+import { ProviderWrapper } from "@/components/provider-wrapper";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -20,7 +21,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
 
   const session = await auth();
 
-  if (chat.visibility === 'private') {
+  if (chat.visibility === "private") {
     if (!session || !session.user) {
       return notFound();
     }
@@ -37,10 +38,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   function convertToUIMessages(messages: Array<DBMessage>): Array<UIMessage> {
     return messages.map((message) => ({
       id: message.id,
-      parts: message.parts as UIMessage['parts'],
-      role: message.role as UIMessage['role'],
+      parts: message.parts as UIMessage["parts"],
+      role: message.role as UIMessage["role"],
       // Note: content will soon be deprecated in @ai-sdk/react
-      content: '',
+      content: "",
       createdAt: message.createdAt,
       experimental_attachments:
         (message.attachments as Array<Attachment>) ?? [],
@@ -48,38 +49,40 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   }
 
   const cookieStore = await cookies();
-  const chatModelFromCookie = cookieStore.get('chat-model');
-  const agentIdFromCookie = cookieStore.get('agent');
+  const chatModelFromCookie = cookieStore.get("chat-model");
+  const agentIdFromCookie = cookieStore.get("agent");
 
   if (!chatModelFromCookie && !agentIdFromCookie) {
     return (
       <>
-        <Chat
-          id={chat.id}
-          initialMessages={convertToUIMessages(messagesFromDb)}
-          selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedChatAgent={'all'}
-          selectedVisibilityType={chat.visibility}
-          isReadonly={session?.user?.id !== chat.userId}
-        />
-        <DataStreamHandler id={id} />
+        <ProviderWrapper>
+          <Chat
+            id={chat.id}
+            initialMessages={convertToUIMessages(messagesFromDb)}
+            selectedChatModel={DEFAULT_CHAT_MODEL}
+            selectedChatAgent={"all"}
+            selectedVisibilityType={chat.visibility}
+            isReadonly={session?.user?.id !== chat.userId}
+          />
+          <DataStreamHandler id={id} />
+        </ProviderWrapper>
       </>
     );
   }
 
-
-
   return (
     <>
-      <Chat
-        id={chat.id}
-        initialMessages={convertToUIMessages(messagesFromDb)}
-        selectedChatModel={chatModelFromCookie?.value || DEFAULT_CHAT_MODEL}
-        selectedChatAgent={agentIdFromCookie?.value || 'all'}
-        selectedVisibilityType={chat.visibility}
-        isReadonly={session?.user?.id !== chat.userId}
-      />
-      <DataStreamHandler id={id} />
+      <ProviderWrapper>
+        <Chat
+          id={chat.id}
+          initialMessages={convertToUIMessages(messagesFromDb)}
+          selectedChatModel={chatModelFromCookie?.value || DEFAULT_CHAT_MODEL}
+          selectedChatAgent={agentIdFromCookie?.value || "all"}
+          selectedVisibilityType={chat.visibility}
+          isReadonly={session?.user?.id !== chat.userId}
+        />
+        <DataStreamHandler id={id} />
+      </ProviderWrapper>
     </>
   );
 }

@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import {
   createPublicClient,
   http,
   parseUnits,
   type Hex,
   type Chain,
+  BaseError,
+  ExecutionRevertedError,
 } from "viem";
 import { useAccount, useSendTransaction, useSwitchChain } from "wagmi";
 // Import all chains from viem/chains - BEWARE of bundle size impact!
@@ -31,22 +34,87 @@ function getChainById(chainId: number): Chain | undefined {
  */
 async function withSafeDefaults(
   chainId: number,
-  tx: { to: Hex; data: Hex; value?: bigint }
+  tx: { to: Hex; data: Hex; value?: bigint },
+  fromAddress?: Hex
 ) {
+  console.log("[withSafeDefaults] Received chainId:", chainId);
+  console.log("[withSafeDefaults] Received tx:", tx);
+  console.log("[withSafeDefaults] Received fromAddress:", fromAddress);
+
   const chain = getChainById(chainId);
   if (!chain) {
-    // Add specific error handling if a chain isn't found in the imported list
-    console.error(`Chain with ID ${chainId} not found in viem/chains import.`);
+    console.error(`[withSafeDefaults] Chain with ID ${chainId} not found.`);
     throw new Error(`Unsupported or unknown chainId: ${chainId}`);
   }
+  console.log("[withSafeDefaults] Found chain:", chain.name);
+
   const client = createPublicClient({
     chain: chain,
     transport: http(),
   });
 
-  const estimated = await client.estimateGas(tx);
-  const gasLimit = (estimated * GAS_LIMIT_BUFFER_PCT) / 100n;
+  // Prepare arguments for estimateGas, including 'account' if available
+  const estimateArgs = {
+    ...tx,
+    ...(fromAddress ? { account: fromAddress } : {}),
+  };
+  console.log(
+    "[withSafeDefaults] Preparing to estimate gas with args:",
+    estimateArgs
+  );
+
+  let estimatedGas: bigint;
+  try {
+    estimatedGas = await client.estimateGas(estimateArgs);
+    console.log("[withSafeDefaults] Estimated gas:", estimatedGas.toString());
+  } catch (error: unknown) {
+    console.error("[withSafeDefaults] Error during client.estimateGas:", error);
+    // Log more details if it's a viem error
+    if (error instanceof BaseError) {
+      console.error(
+        "[withSafeDefaults] Viem BaseError Details:",
+        error.details
+      );
+      console.error(
+        "[withSafeDefaults] Viem BaseError Short Message:",
+        error.shortMessage
+      );
+      // Specifically check for ExecutionRevertedError
+      const cause = error.walk((e) => e instanceof ExecutionRevertedError);
+      if (cause instanceof ExecutionRevertedError) {
+        console.error(
+          "[withSafeDefaults] ExecutionRevertedError Details:",
+          cause.details
+        );
+      }
+    } else if (error instanceof Error) {
+      console.error(
+        "[withSafeDefaults] Standard Error message:",
+        error.message
+      );
+      console.error("[withSafeDefaults] Standard Error stack:", error.stack);
+    } else {
+      console.error("[withSafeDefaults] Unknown error type during estimateGas");
+    }
+    // Re-throw the error to be caught by the calling function (signTx)
+    throw error;
+  }
+
+  const gasLimit = (estimatedGas * GAS_LIMIT_BUFFER_PCT) / 100n;
+  console.log(
+    "[withSafeDefaults] Calculated gasLimit (with buffer):",
+    gasLimit.toString()
+  );
+
   const block = await client.getBlock({ blockTag: "latest" });
+  console.log(
+    "[withSafeDefaults] Fetched latest block number:",
+    block.number?.toString()
+  );
+  console.log(
+    "[withSafeDefaults] Fetched latest block baseFeePerGas:",
+    block.baseFeePerGas?.toString()
+  );
 
   // Check for EIP-1559 support correctly based on block base fee
   if (block.baseFeePerGas !== null && block.baseFeePerGas !== undefined) {
@@ -54,19 +122,28 @@ async function withSafeDefaults(
     const baseFee = block.baseFeePerGas;
     const priority = parseUnits(DEFAULT_PRIORITY_FEE_GWEI, 9);
     // Ensure baseFee isn't extremely low, add buffer logic if necessary
-    const maxFee = baseFee * 2n + priority;
-    return {
+    const maxFee = baseFee * 2n + priority; // Common strategy: 2 * base + priority
+    const overrides = {
       gas: gasLimit,
       maxPriorityFeePerGas: priority,
       maxFeePerGas: maxFee,
     };
+    console.log("[withSafeDefaults] EIP-1559 Overrides:", overrides);
+    return overrides;
   } else {
     // Legacy chain (or chain where baseFeePerGas is null)
     const gasPrice = await client.getGasPrice();
-    return {
+    console.log(
+      "[withSafeDefaults] Fetched legacy gasPrice:",
+      gasPrice.toString()
+    );
+    const bufferedGasPrice = (gasPrice * LEGACY_GAS_PRICE_BUFFER_PCT) / 100n;
+    const overrides = {
       gas: gasLimit,
-      gasPrice: (gasPrice * LEGACY_GAS_PRICE_BUFFER_PCT) / 100n,
+      gasPrice: bufferedGasPrice,
     };
+    console.log("[withSafeDefaults] Legacy Overrides:", overrides);
+    return overrides;
   }
 }
 
@@ -77,99 +154,247 @@ export function Transaction({
   txPreview: any;
   txPlan: any;
 }) {
-  const { data, error, isPending, isSuccess, sendTransactionAsync } =
-    useSendTransaction();
-  // Get current chainId from useAccount
+  const {
+    data: txResultData,
+    error: txError,
+    isPending: isTxPending,
+    isSuccess: isTxSuccess,
+    sendTransactionAsync,
+  } = useSendTransaction();
+  // Get current chainId AND address from useAccount
   const { address, isConnected, chainId: currentChainId } = useAccount();
-  // Get switchChain function
   const { switchChainAsync } = useSwitchChain();
 
-  async function signTx(transaction: any) {
+  // State for tracking approval transaction
+  const [isApprovalPending, setIsApprovalPending] = useState(false);
+  const [isApprovalSuccess, setIsApprovalSuccess] = useState(false);
+  const [approvalError, setApprovalError] = useState<Error | null>(null);
+
+  // Determine if an approval step is needed
+  const needsApproval = txPlan && txPlan.length > 1;
+
+  async function signTx(
+    transaction: any,
+    requiredChainId: number,
+    isApprovalTx: boolean = false
+  ) {
+    console.log(
+      `[signTx] Initiated. Is approval: ${isApprovalTx}, Required ChainId: ${requiredChainId}`,
+      transaction
+    );
     if (
       !transaction.to ||
       !isConnected ||
       !currentChainId ||
-      !switchChainAsync
+      !switchChainAsync ||
+      !address
     ) {
-      console.error(
-        "Prerequisites not met for signing: Check connection, chainId, or switchChain availability."
-      );
+      console.error("[signTx] Prerequisites not met:", {
+        isConnected,
+        currentChainId,
+        switchChainAvailable: !!switchChainAsync,
+        addressAvailable: !!address,
+        transactionTo: transaction.to,
+      });
+      if (isApprovalTx)
+        setApprovalError(
+          new Error("Wallet not connected or chain/address invalid.")
+        );
+      if (isApprovalTx) setIsApprovalPending(false);
       return;
     }
 
-    const requiredChainId = parseInt(transaction.chainId);
-    if (isNaN(requiredChainId)) {
-      console.error("Invalid required chainId:", transaction.chainId);
-      return;
+    console.log(
+      `[signTx] User Address: ${address}, Current ChainID: ${currentChainId}, Required ChainID (from arg): ${requiredChainId}`
+    );
+
+    if (isApprovalTx) {
+      console.log("[signTx] Setting approval state to pending.");
+      setIsApprovalPending(true);
+      setApprovalError(null);
+      setIsApprovalSuccess(false);
+    } else {
+      console.log(
+        "[signTx] Main transaction process starting (pending state handled by hook)."
+      );
     }
 
     try {
-      // --- Network Switching Logic ---
       if (currentChainId !== requiredChainId) {
         console.log(
-          `Switching network from ${currentChainId} to ${requiredChainId}`
+          `[signTx] Switching network from ${currentChainId} to ${requiredChainId}`
         );
         await switchChainAsync({ chainId: requiredChainId });
-        // After switchChainAsync resolves, wagmi's internal state
-        // and the value from useAccount() should update automatically,
-        // so sendTransactionAsync below will use the new chain.
-        // Add a small delay or check if necessary, though often not needed.
-        console.log(`Network switch to ${requiredChainId} requested.`);
+        console.log(
+          `[signTx] Network switch to ${requiredChainId} request successful. Waiting for wallet confirmation and state update...`
+        );
+      } else {
+        console.log(
+          `[signTx] Already connected to the required chain: ${requiredChainId}`
+        );
       }
-      // --- End Network Switching Logic ---
 
-      // Prepare base tx
       const txBase = {
         to: transaction.to as Hex,
         data: transaction.data as Hex,
         value: toBigInt(transaction.value),
       };
+      console.log("[signTx] Prepared base transaction:", txBase);
 
-      // Compute gas overrides (uses the REQUIRED chainId for calculation)
-      const overrides = await withSafeDefaults(requiredChainId, txBase);
-      console.log("Transaction Details:", {
+      console.log(
+        `[signTx] Calling withSafeDefaults for ${
+          isApprovalTx ? "approval" : "main"
+        } tx on chain ${requiredChainId}...`
+      );
+      const overrides = await withSafeDefaults(
+        requiredChainId,
+        txBase,
+        address
+      );
+      console.log(
+        `[signTx] Received gas overrides from withSafeDefaults for chain ${requiredChainId}:`,
+        overrides
+      );
+
+      const finalTx = {
         ...txBase,
         ...overrides,
-        chainId: requiredChainId,
-      });
+      };
+      console.log(
+        `[signTx] Prepared final transaction object for ${
+          isApprovalTx ? "approval" : "main"
+        } tx:`,
+        finalTx
+      );
 
-      // Send transaction - wagmi uses the currently connected chain
-      // (which should now be requiredChainId after potential switch)
-      await sendTransactionAsync({
-        ...txBase,
-        // No explicit chainId needed here
-        ...overrides,
-      });
-      console.log("Transaction sent via sendTransactionAsync");
-    } catch (err: any) {
-      // Catch potential errors from switchChainAsync or sendTransactionAsync
-      console.error("Error during network switch or transaction sending:", err);
-      // Handle specific errors if needed (e.g., user rejected switch)
-      if (err.code === 4001) {
-        // Standard EIP-1193 user rejected request error
-        console.log("User rejected the network switch or transaction.");
+      console.log(
+        `[signTx] Calling sendTransactionAsync for ${
+          isApprovalTx ? "approval" : "main"
+        } tx...`
+      );
+      await sendTransactionAsync(finalTx);
+      console.log(
+        `[signTx] sendTransactionAsync call completed successfully for ${
+          isApprovalTx ? "approval" : "main"
+        } tx.`
+      );
+
+      if (isApprovalTx) {
+        console.log("[signTx] Setting approval state to success.");
+        setIsApprovalSuccess(true);
+      } else {
+        console.log(
+          "[signTx] Main transaction sent (success state handled by hook)."
+        );
       }
-      // Update UI state to show the error
+    } catch (err: any) {
+      console.error(
+        `[signTx] Error during ${
+          isApprovalTx ? "approval" : "main"
+        } transaction processing:`,
+        err
+      );
+      if (err.code === 4001) {
+        console.log(
+          "[signTx] User rejected the network switch or transaction signature."
+        );
+      } else if (err instanceof BaseError) {
+        console.error("[signTx] Viem BaseError Details:", err.details);
+        console.error(
+          "[signTx] Viem BaseError Short Message:",
+          err.shortMessage
+        );
+        const cause = err.walk((e) => e instanceof ExecutionRevertedError);
+        if (cause instanceof ExecutionRevertedError) {
+          console.error(
+            "[signTx] ExecutionRevertedError detected in signTx catch block. Details:",
+            cause.details
+          );
+        }
+      } else if (err instanceof Error) {
+        console.error("[signTx] Standard Error message:", err.message);
+        console.error("[signTx] Standard Error stack:", err.stack);
+      } else {
+        console.error("[signTx] Unknown error type caught in signTx.");
+      }
+
+      if (isApprovalTx) {
+        console.log("[signTx] Setting approval error state.");
+        setApprovalError(err);
+        setIsApprovalSuccess(false);
+      }
+    } finally {
+      if (isApprovalTx) {
+        console.log(
+          "[signTx] Resetting approval pending state in finally block."
+        );
+        setIsApprovalPending(false);
+      }
     }
   }
 
   const signMainTransaction = () => {
-    if (!txPlan) return;
+    if (!txPlan || !txPreview?.chainId) {
+      console.error(
+        "[signMainTransaction] txPlan or txPreview.chainId missing."
+      );
+      return;
+    }
+    if (needsApproval && !isApprovalSuccess) {
+      console.warn(
+        "[signMainTransaction] Approval step not completed successfully. Preventing execution."
+      );
+      return;
+    }
+    console.log("[signMainTransaction] Proceeding to sign main transaction.");
     const transaction = txPlan[txPlan.length - 1];
-    signTx(transaction);
+    const parsedChainId = parseInt(txPreview.chainId);
+    if (isNaN(parsedChainId)) {
+      console.error(
+        "[signMainTransaction] Invalid chainId in txPreview:",
+        txPreview.chainId
+      );
+      setApprovalError(
+        new Error(
+          `Invalid chainId in transaction preview: ${txPreview.chainId}`
+        )
+      );
+      return;
+    }
+    signTx(transaction, parsedChainId, false);
   };
 
   const approveTransaction = () => {
-    if (!txPlan || txPlan.length <= 1) {
-      console.log("No approval step needed or txPlan invalid.");
+    if (!needsApproval || !txPlan || !txPreview?.chainId) {
+      console.log(
+        "[approveTransaction] No approval step needed or txPlan/txPreview.chainId invalid."
+      );
       return;
     }
+    console.log(
+      "[approveTransaction] Proceeding to sign approval transaction."
+    );
     const approvalTransaction = txPlan[0];
-    signTx(approvalTransaction);
+    const parsedChainId = parseInt(txPreview.chainId);
+    if (isNaN(parsedChainId)) {
+      console.error(
+        "[approveTransaction] Invalid chainId in txPreview:",
+        txPreview.chainId
+      );
+      setApprovalError(
+        new Error(
+          `Invalid chainId in transaction preview: ${txPreview.chainId}`
+        )
+      );
+      setIsApprovalPending(false);
+      return;
+    }
+    signTx(approvalTransaction, parsedChainId, true);
   };
 
+  const isAnyTxPending = isApprovalPending || isTxPending;
+
   return (
-    // If txPreview or TxPlan is not defined, return null
     <>
       {txPlan && txPreview && (
         <div className="flex flex-col gap-2 p-4 bg-slate-700 shadow-md rounded-lg text-white border-slate-500 border-2">
@@ -214,53 +439,86 @@ export function Transaction({
               {txPreview?.toTokenAmount &&
                 txPreview?.toTokenSymbol.toUpperCase()}
             </span>
-            {/* horizontal divider */}
-            <div className="border-t border-gray-300 my-2"></div>
-            <a
-              href={txPreview?.explorerUrl}
-              target="_blank"
-              rel="noopener noreferer"
-              className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-            >
-              Explore
-            </a>
           </p>
+          <div className="border-t border-gray-300 my-2"></div>
+          <a
+            href={txPreview?.explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+          >
+            Explore Transaction Plan
+          </a>
 
           {isConnected ? (
             <>
-              {isSuccess && (
+              {isTxSuccess && (
                 <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
-                  {isSuccess && "Success!"}
+                  Transaction Successful!
                 </p>
               )}
-              {isPending && (
+              {isTxPending && (!needsApproval || isApprovalSuccess) && (
                 <p className=" p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2 text-slate-800">
-                  {isPending && "Pending..."}
+                  Executing Transaction...
                 </p>
               )}
-              {error && (
-                <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white">
-                  Error! {error.message || JSON.stringify(error, null, 2)}
+              {txError && (
+                <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white break-words">
+                  Execution Error!{" "}
+                  {(txError as any).shortMessage ||
+                    txError.message ||
+                    JSON.stringify(txError, null, 2)}
                 </p>
               )}
+
+              {needsApproval && isApprovalPending && (
+                <p className=" p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2 text-slate-800">
+                  Processing Approval...
+                </p>
+              )}
+              {needsApproval && approvalError && (
+                <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white break-words">
+                  Approval Error!{" "}
+                  {(approvalError as any).shortMessage ||
+                    approvalError.message ||
+                    JSON.stringify(approvalError, null, 2)}
+                </p>
+              )}
+              {needsApproval &&
+                isApprovalSuccess &&
+                !isTxSuccess &&
+                !isTxPending && (
+                  <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
+                    Approval Sent! Ready to execute.
+                  </p>
+                )}
+
               <div className="flex gap-3">
-                {txPlan?.length > 1 && (
+                {needsApproval && (
                   <button
                     className="mt-4 bg-blue-500 text-white py-2 px-4 rounded disabled:opacity-50"
                     type="button"
                     onClick={approveTransaction}
-                    disabled={isPending}
+                    disabled={isAnyTxPending || isApprovalSuccess}
                   >
-                    Approve Transaction
+                    {isApprovalPending
+                      ? "Approving..."
+                      : isApprovalSuccess
+                      ? "Approved"
+                      : "Approve Transaction"}
                   </button>
                 )}
                 <button
                   className="mt-4 bg-red-500 text-white py-2 px-4 rounded disabled:opacity-50"
                   type="button"
                   onClick={signMainTransaction}
-                  disabled={isPending}
+                  disabled={
+                    isAnyTxPending || (needsApproval && !isApprovalSuccess)
+                  }
                 >
-                  {txPlan?.length > 1
+                  {isTxPending
+                    ? "Executing..."
+                    : needsApproval
                     ? "Execute Transaction"
                     : "Sign Transaction"}
                 </button>
@@ -277,15 +535,24 @@ export function Transaction({
   );
 }
 
-// Added a helper function to convert values to BigInt safely
 function toBigInt(
   value: string | number | boolean | bigint | undefined
 ): bigint | undefined {
   if (value === undefined || value === null) return undefined;
   try {
+    if (typeof value === "string" && value.toLowerCase().includes("e")) {
+      const parts = value.toLowerCase().split("e");
+      if (parts.length === 2) {
+        const base = parseFloat(parts[0]);
+        const exponent = parseInt(parts[1], 10);
+        if (!isNaN(base) && !isNaN(exponent)) {
+          return BigInt(Math.round(base * Math.pow(10, exponent)));
+        }
+      }
+    }
     return BigInt(value);
   } catch (e) {
-    console.error("Failed to convert value to BigInt:", value, e);
+    console.error("[toBigInt] Failed to convert value to BigInt:", value, e);
     return undefined;
   }
 }
