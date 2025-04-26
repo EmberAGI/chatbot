@@ -5,9 +5,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "../(auth)/auth";
 import Script from "next/script";
 import { ProviderWrapper } from "@/components/provider-wrapper";
-import { Session } from "next-auth";
-import { NextComponentType } from "next";
-import { Router } from "next/router";
+
 
 export const experimental_ppr = true;
 
@@ -19,20 +17,17 @@ export default async function Layout({
   const [session, cookieStore] = await Promise.all([auth(), cookies()]);
   const isCollapsed = cookieStore.get("sidebar:state")?.value !== "true";
   
-  const childrenSidebar = <SidebarProvider defaultOpen={!isCollapsed}>
-  <AppSidebar user={session?.user} />
-  <SidebarInset>{children}</SidebarInset>
-</SidebarProvider>
-    
-  
   return (
     <>
       <Script
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         strategy="beforeInteractive"
       />
-      <ProviderWrapper session={session} children={childrenSidebar}>
-       
+      <ProviderWrapper session={session}>
+      <SidebarProvider defaultOpen={!isCollapsed}>
+  <AppSidebar user={session?.user} />
+  <SidebarInset>{children}</SidebarInset>
+</SidebarProvider>
       </ProviderWrapper>
     </>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
   darkTheme,
@@ -14,11 +15,9 @@ import {
 } from "wagmi";
 import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import React from "react";
-import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
 import { SessionProvider } from "next-auth/react";
-import { AppProps } from "next/app";
 import { Session } from "next-auth";
+import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
 
 export function ProviderWrapper({session, children}: {session: Session | null, children: React.ReactNode}) {
   const config = getDefaultConfig({
