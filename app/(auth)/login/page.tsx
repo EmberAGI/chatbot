@@ -9,6 +9,7 @@ import { AuthForm } from '@/components/auth-form';
 import { SubmitButton } from '@/components/submit-button';
 
 import { login, type LoginActionState } from '../actions';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 export default function Page() {
   const router = useRouter();
@@ -54,6 +55,7 @@ export default function Page() {
             Use your email and password to sign in
           </p>
         </div>
+        <ConnectButton />
         <AuthForm action={handleSubmit} defaultEmail={email}>
           <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
