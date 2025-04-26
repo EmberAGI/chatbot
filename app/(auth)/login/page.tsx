@@ -10,9 +10,13 @@ import { SubmitButton } from '@/components/submit-button';
 
 import { login, type LoginActionState } from '../actions';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ProviderWrapper } from '@/components/provider-wrapper';
+import { auth } from '../auth';
 
-export default function Page() {
+export default async function Page() {
   const router = useRouter();
+
+  const session = await auth()
 
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
@@ -46,7 +50,10 @@ export default function Page() {
     formAction(formData);
   };
 
+ 
+
   return (
+    <ProviderWrapper session={session}>
     <div className="flex h-dvh w-screen items-start pt-12 md:pt-0 md:items-center justify-center bg-background">
       <div className="w-full max-w-md overflow-hidden rounded-2xl flex flex-col gap-12">
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center sm:px-16">
@@ -70,6 +77,7 @@ export default function Page() {
           </p>
         </AuthForm>
       </div>
-    </div>
+      </div>
+      </ProviderWrapper>
   );
 }
