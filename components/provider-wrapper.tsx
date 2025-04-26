@@ -20,10 +20,7 @@ import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
 import { Session } from "next-auth";
 
-export function ProviderWrapper({
-  Component,
-  pageProps,
-}: AppProps<{ session: Session }>) {
+export function ProviderWrapper({session, children}: {session: Session | null, children: React.ReactNode}) {
   const config = getDefaultConfig({
     appName: "My RainbowKit App",
     projectId: "4b49e5e63b9f6253943b470873b47208",
@@ -43,7 +40,7 @@ export function ProviderWrapper({
         reconnectOnMount={true}
         initialState={initialState}
       >
-        <SessionProvider refetchInterval={0} session={pageProps.session}>
+        <SessionProvider refetchInterval={0} session={session}>
           <QueryClientProvider client={queryClient}>
             <RainbowKitSiweNextAuthProvider>
               {" "}
@@ -53,7 +50,7 @@ export function ProviderWrapper({
                   accentColorForeground: "#fff",
                 })}
               >
-                <Component {...pageProps} />
+               {children}
               </RainbowKitProvider>
             </RainbowKitSiweNextAuthProvider>
           </QueryClientProvider>
