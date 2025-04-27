@@ -3,8 +3,8 @@ import { myProvider } from '@/lib/ai/providers';
 import { createDocumentHandler } from '@/lib/artifacts/server';
 import { updateDocumentPrompt } from '@/lib/ai/prompts';
 
-export const aaveDocumentHandler = createDocumentHandler<'text'>({
-  kind: 'text',
+export const aaveDocumentHandler = createDocumentHandler<'aave'>({
+  kind: 'aave',
   onCreateDocument: async ({ title, dataStream }) => {
     let draftContent = '';
 
