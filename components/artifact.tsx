@@ -235,7 +235,8 @@ function PureArtifact({
 
   const { width: windowWidth, height: windowHeight } = useWindowSize();
   const isMobile = windowWidth ? windowWidth < 768 : false;
-
+  console.log(artifactDefinitions);
+  console.log(artifact);
   const artifactDefinition = artifactDefinitions.find(
     (definition) => definition.kind === artifact.kind
   );
