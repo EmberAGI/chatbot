@@ -1175,8 +1175,8 @@ export const WarningIcon = ({ size = 16 }: { size?: number }) => {
 
 export const FromIcon = ({ size = 16 }: { size?: number }) => (
   <svg
-    width="46px"
-    height="46px"
+    width={size}
+    height={size}
     stroke-width="1.5"
     viewBox="0 0 24 24"
     fill="none"
@@ -1202,8 +1202,8 @@ export const FromIcon = ({ size = 16 }: { size?: number }) => (
 
 export const ToIcon = ({ size = 16 }: { size?: number }) => (
   <svg
-    width="46px"
-    height="46px"
+    width={size}
+    height={size}
     stroke-width="1.5"
     viewBox="0 0 24 24"
     fill="none"
