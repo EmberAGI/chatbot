@@ -398,11 +398,11 @@ export function Transaction({
   return (
     <>
       {txPlan && txPreview && (
-        <div className="flex flex-col gap-2 p-4 bg-rose-900 shadow-md rounded-lg text-white border-slate-500 border-2">
+        <div className="flex flex-col gap-2 p-4 bg-slate-700 shadow-md rounded-lg text-white border-slate-500 border-2">
           <h2 className="text-lg font-semibold">Transaction Preview</h2>
-          <div className="rounded-l bg-slate-600 p-2 border-slate-500 border-2">
-            <span className="font-semibold flex w-full">
-              <FromIcon size={12} />
+          <div className="rounded-lg bg-slate-600 p-2 border-slate-500 border-2">
+            <span className="font-semibold flex w-full items-center text-sm">
+              <FromIcon size={16} />
               From:{" "}
             </span>
 
@@ -417,13 +417,13 @@ export function Transaction({
               </span>
             </p>
             <p className="font-normal w-full pb-2">
-              <span className="font-normal">
+              <span className="font-normal  text-sm">
                 {txPreview?.fromTokenAddress}{" "}
               </span>
             </p>
 
-            <span className="font-semibold flex w-full">
-              <ToIcon size={12} />
+            <span className="font-semibold flex w-full items-center text-sm">
+              <ToIcon size={16} />
               To:{" "}
             </span>
 
@@ -437,7 +437,7 @@ export function Transaction({
                 {")"}
               </span>
             </p>
-            <p className="font-normal w-full">
+            <p className="font-normal w-full text-sm">
               <span className="font-normal">{txPreview?.toTokenAddress} </span>
             </p>
           </div>
