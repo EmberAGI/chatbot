@@ -13,6 +13,7 @@ import {
 import { useAccount, useSendTransaction, useSwitchChain } from "wagmi";
 // Import all chains from viem/chains - BEWARE of bundle size impact!
 import * as allViemChains from "viem/chains";
+import { FromIcon } from "./icons";
 
 // === global tuning parameters ===
 const GAS_LIMIT_BUFFER_PCT = 120n; // 120% → +20%
@@ -402,44 +403,55 @@ export function Transaction({
 
           <div className="flex gap-2">
             <p className="font-semibold">
+              <FromIcon />
               From:{" "}
+            </p>
+            <p className="font-normal">
               <span className="font-normal">
-                {txPreview?.fromTokenSymbol &&
+                {txPreview?.fromTokenAmount}{" "}
+                {txPreview?.fromTokenAmount &&
                   txPreview?.fromTokenSymbol.toUpperCase()}
+                {" (on "}
+                {txPreview?.fromChain}
+                {")"}
               </span>
             </p>
-            <p className="font-semibold">
-              To:{" "}
+            <p className="font-normal">
               <span className="font-normal">
-                {txPreview?.toTokenSymbol &&
-                  txPreview?.toTokenSymbol.toUpperCase()}
+                {txPreview?.fromTokenAddress}{" "}
               </span>
             </p>
           </div>
           <div className="flex gap-2">
             <p className="font-semibold">
-              From Chain:{" "}
-              <span className="font-normal">{txPreview?.fromChain}</span>
+              <FromIcon />
+              To:{" "}
             </p>
-            <p className="font-semibold">
-              To Chain:{" "}
-              <span className="font-normal">{txPreview?.toChain}</span>
+            <p className="font-normal">
+              <span className="font-normal">
+                {txPreview?.toTokenAmount}{" "}
+                {txPreview?.toTokenAmount &&
+                  txPreview?.toTokenSymbol.toUpperCase()}
+                {" (on "}
+                {txPreview?.fromChain}
+                {")"}
+              </span>
+            </p>
+            <p className="font-normal">
+              <span className="font-normal">
+                {txPreview?.toTokenAddress}{" "}
+                {txPreview?.fromTokenAmount &&
+                  txPreview?.fromTokenSymbol.toUpperCase()}
+                /
+                {txPreview?.toTokenAmount &&
+                  txPreview?.toTokenSymbol.toUpperCase()}{" "}
+              </span>
             </p>
           </div>
-
-          <p className="font-semibold">
-            Amount:{" "}
-            <span className="font-normal">
-              {txPreview?.fromTokenAmount}{" "}
-              {txPreview?.fromTokenAmount &&
-                txPreview?.fromTokenSymbol.toUpperCase() + " to "}
-            </span>
-            <span className="font-normal">
-              {txPreview?.toTokenAmount}{" "}
-              {txPreview?.toTokenAmount &&
-                txPreview?.toTokenSymbol.toUpperCase()}
-            </span>
-          </p>
+          <div className="flex gap-2">
+            <span className="font-semibold">Exchange Rate:</span>
+            <span className="font-normal">{txPreview?.exchangeRate}</span>
+          </div>
           <div className="border-t border-gray-300 my-2"></div>
           <a
             href={txPreview?.explorerUrl}
@@ -449,7 +461,7 @@ export function Transaction({
           >
             Explore Transaction Plan
           </a>
-
+          <div className="border-t border-gray-300 my-2"></div>
           {isConnected ? (
             <>
               {isTxSuccess && (
