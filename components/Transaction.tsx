@@ -398,9 +398,9 @@ export function Transaction({
   return (
     <>
       {txPlan && txPreview && (
-        <div className="flex flex-col gap-2 p-4 bg-slate-700 shadow-md rounded-lg text-white border-slate-500 border-2">
+        <div className="flex flex-col gap-2 p-4 bg-rose-900 shadow-md rounded-lg text-white border-slate-500 border-2">
           <h2 className="text-lg font-semibold">Transaction Preview</h2>
-          <div className="card">
+          <div className="rounded-l bg-rose-800  border-slate-500 border-2">
             <span className="font-semibold flex w-full">
               <FromIcon size={12} />
               From:{" "}
