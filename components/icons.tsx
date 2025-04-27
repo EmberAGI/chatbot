@@ -1181,18 +1181,18 @@ export const FromIcon = ({ size = 16 }: { size?: number }) => (
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    color="#000000"
+    color="currentColor"
   >
     <path
       d="M20 14C18.8954 14 18 13.1046 18 12C18 10.8954 18.8954 10 20 10C21.1046 10 22 10.8954 22 12C22 13.1046 21.1046 14 20 14Z"
-      stroke="#000000"
+      stroke="currentColor"
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"
     ></path>
     <path
       d="M15 12H2M2 12L5 9M2 12L5 15"
-      stroke="#000000"
+      stroke="currentColor"
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"
@@ -1208,18 +1208,18 @@ export const ToIcon = ({ size = 16 }: { size?: number }) => (
     viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    color="#000000"
+    color="currentColor"
   >
     <path
       d="M4 14C2.89543 14 2 13.1046 2 12C2 10.8954 2.89543 10 4 10C5.10457 10 6 10.8954 6 12C6 13.1046 5.10457 14 4 14Z"
-      stroke="#000000"
+      stroke="currentColor"
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"
     ></path>
     <path
       d="M9 12H22M22 12L19 9M22 12L19 15"
-      stroke="#000000"
+      stroke="currentColor"
       stroke-width="1.5"
       stroke-linecap="round"
       stroke-linejoin="round"

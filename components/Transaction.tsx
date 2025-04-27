@@ -13,7 +13,7 @@ import {
 import { useAccount, useSendTransaction, useSwitchChain } from "wagmi";
 // Import all chains from viem/chains - BEWARE of bundle size impact!
 import * as allViemChains from "viem/chains";
-import { FromIcon } from "./icons";
+import { FromIcon, ToIcon } from "./icons";
 
 // === global tuning parameters ===
 const GAS_LIMIT_BUFFER_PCT = 120n; // 120% → +20%
@@ -398,15 +398,15 @@ export function Transaction({
   return (
     <>
       {txPlan && txPreview && (
-        <div className="flex flex-col gap-2 p-4 bg-slate-700 shadow-md rounded-lg text-white border-slate-500 border-2">
+        <div className="flex flex-col gap-2 p-4 bg-rose-900 shadow-md rounded-lg text-white border-slate-500 border-2">
           <h2 className="text-lg font-semibold">Transaction Preview</h2>
-
-          <div className="flex gap-2">
-            <p className="font-semibold">
-              <FromIcon />
+          <div className="rounded-l bg-rose-800  border-slate-500 border-2">
+            <span className="font-semibold flex w-full">
+              <FromIcon size={12} />
               From:{" "}
-            </p>
-            <p className="font-normal">
+            </span>
+
+            <p className="font-normal w-full">
               <span className="font-normal">
                 {txPreview?.fromTokenAmount}{" "}
                 {txPreview?.fromTokenAmount &&
@@ -416,36 +416,29 @@ export function Transaction({
                 {")"}
               </span>
             </p>
-            <p className="font-normal">
+            <p className="font-normal w-full">
               <span className="font-normal">
                 {txPreview?.fromTokenAddress}{" "}
               </span>
             </p>
-          </div>
-          <div className="flex gap-2">
-            <p className="font-semibold">
-              <FromIcon />
+
+            <span className="font-semibold flex w-full">
+              <ToIcon size={12} />
               To:{" "}
-            </p>
-            <p className="font-normal">
+            </span>
+
+            <p className="font-normal w-full">
               <span className="font-normal">
                 {txPreview?.toTokenAmount}{" "}
                 {txPreview?.toTokenAmount &&
                   txPreview?.toTokenSymbol.toUpperCase()}
                 {" (on "}
-                {txPreview?.fromChain}
+                {txPreview?.toChain}
                 {")"}
               </span>
             </p>
-            <p className="font-normal">
-              <span className="font-normal">
-                {txPreview?.toTokenAddress}{" "}
-                {txPreview?.fromTokenAmount &&
-                  txPreview?.fromTokenSymbol.toUpperCase()}
-                /
-                {txPreview?.toTokenAmount &&
-                  txPreview?.toTokenSymbol.toUpperCase()}{" "}
-              </span>
+            <p className="font-normal w-full">
+              <span className="font-normal">{txPreview?.toTokenAddress} </span>
             </p>
           </div>
           <div className="flex gap-2">
