@@ -18,9 +18,10 @@ interface TextArtifactMetadata {
   suggestions: Array<Suggestion>;
 }
 
-export const aaveArtifact = new Artifact<"text", TextArtifactMetadata>({
-  kind: "text",
-  description: "Useful for text content, like drafting essays and emails.",
+export const aaveArtifact = new Artifact<"aave", TextArtifactMetadata>({
+  kind: "aave",
+  description:
+    "Useful for lending and borrowing assets on Aave. Powered by EmberAI.",
   initialize: async ({ documentId, setMetadata }) => {
     const suggestions = await getSuggestions({ documentId });
 
