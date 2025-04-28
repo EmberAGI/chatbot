@@ -1,33 +1,38 @@
-import { smoothStream, streamText } from 'ai';
+import { smoothStream, streamObject, streamText } from 'ai';
 import { myProvider } from '@/lib/ai/providers';
 import { createDocumentHandler } from '@/lib/artifacts/server';
 import { updateDocumentPrompt } from '@/lib/ai/prompts';
+import { z } from 'zod';
 
 export const aaveDocumentHandler = createDocumentHandler<'aave'>({
   kind: 'aave',
   onCreateDocument: async ({ title, dataStream }) => {
     let draftContent = '';
 
-    const { fullStream } = streamText({
+    const { fullStream } = streamObject({
       model: myProvider.languageModel('artifact-model'),
-      system:
-        'Write about the given topic. Markdown is supported. Use headings wherever appropriate.',
-      experimental_transform: smoothStream({ chunking: 'word' }),
+      system: 'Render the aave artifact',
       prompt: title,
+      schema: z.object({
+        code: z.string(),
+      }),
     });
 
     for await (const delta of fullStream) {
       const { type } = delta;
 
-      if (type === 'text-delta') {
-        const { textDelta } = delta;
+      if (type === 'object') {
+        const { object } = delta;
+        const { code } = object;
 
-        draftContent += textDelta;
+        if (code) {
+          dataStream.writeData({
+            type: 'code-delta',
+            content: code ?? '',
+          });
 
-        dataStream.writeData({
-          type: 'text-delta',
-          content: textDelta,
-        });
+          draftContent = code;
+        }
       }
     }
 
@@ -36,32 +41,30 @@ export const aaveDocumentHandler = createDocumentHandler<'aave'>({
   onUpdateDocument: async ({ document, description, dataStream }) => {
     let draftContent = '';
 
-    const { fullStream } = streamText({
+    const { fullStream } = streamObject({
       model: myProvider.languageModel('artifact-model'),
-      system: updateDocumentPrompt(document.content, 'text'),
-      experimental_transform: smoothStream({ chunking: 'word' }),
+      system: updateDocumentPrompt(document.content, 'code'),
       prompt: description,
-      experimental_providerMetadata: {
-        openai: {
-          prediction: {
-            type: 'content',
-            content: document.content,
-          },
-        },
-      },
+      schema: z.object({
+        code: z.string(),
+      }),
     });
 
     for await (const delta of fullStream) {
       const { type } = delta;
 
-      if (type === 'text-delta') {
-        const { textDelta } = delta;
+      if (type === 'object') {
+        const { object } = delta;
+        const { code } = object;
 
-        draftContent += textDelta;
-        dataStream.writeData({
-          type: 'text-delta',
-          content: textDelta,
-        });
+        if (code) {
+          dataStream.writeData({
+            type: 'code-delta',
+            content: code ?? '',
+          });
+
+          draftContent = code;
+        }
       }
     }
 

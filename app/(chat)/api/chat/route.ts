@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     console.log('Dynamic tools:', dynamicTools);
 
       return createDataStreamResponse({
-      execute: (dataStream) => {
+        execute: (dataStream) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
           system: systemPrompt({ 
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
               session,
               dataStream,
             }),
-            ...dynamicTools
+            ...dynamicTools,
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {

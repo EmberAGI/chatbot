@@ -13,6 +13,7 @@ import {
 import { Suggestion } from "@/lib/db/schema";
 import { toast } from "sonner";
 import { getSuggestions } from "../actions";
+import { Transaction } from "@/components/Transaction";
 
 interface TextArtifactMetadata {
   suggestions: Array<Suggestion>;
@@ -21,7 +22,7 @@ interface TextArtifactMetadata {
 export const aaveArtifact = new Artifact<"aave", TextArtifactMetadata>({
   kind: "aave",
   description:
-    "Useful for lending and borrowing assets on Aave. Powered by EmberAI.",
+    "Useful for lending and borrowing assets on Aave. Powered by Ember.",
   initialize: async ({ documentId, setMetadata }) => {
     const suggestions = await getSuggestions({ documentId });
 
@@ -82,20 +83,7 @@ export const aaveArtifact = new Artifact<"aave", TextArtifactMetadata>({
     return (
       <>
         <div className="flex flex-row py-8 md:p-20 px-4">
-          <Editor
-            content={content}
-            suggestions={metadata ? metadata.suggestions : []}
-            isCurrentVersion={isCurrentVersion}
-            currentVersionIndex={currentVersionIndex}
-            status={status}
-            onSaveContent={onSaveContent}
-          />
-
-          {metadata &&
-          metadata.suggestions &&
-          metadata.suggestions.length > 0 ? (
-            <div className="md:hidden h-dvh w-12 shrink-0" />
-          ) : null}
+          <Transaction txPreview={null} txPlan={null} />
         </div>
       </>
     );

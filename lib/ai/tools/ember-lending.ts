@@ -1,9 +1,13 @@
-import { tool, type CoreTool } from 'ai';
+import { DataStreamWriter, tool, type CoreTool } from 'ai';
 import { z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
 import { cookies } from 'next/headers';
 import { chatAgents } from './agents/agents';
+import { documentHandlersByArtifactKind } from '@/lib/artifacts/server';
+import { generateUUID } from '@/lib/utils';
+import { Session } from 'next-auth';
+import { aaveDocumentHandler } from '@/artifacts/aave/server';
 
 /*export const getEmberLending = tool({
   description: 'Get the current weather at a location',
@@ -215,6 +219,8 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
         //const result = 'chat lending USDC successfully';
         console.log('RUNNING TOOL:', mcptool.name);
         console.log(result);
+
+        // Return
         const toolResult = {status: 'completed', result: result}
         return toolResult;
       },
