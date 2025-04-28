@@ -180,9 +180,9 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
-                      ) : (
+                      ) : toolName === "askSwapAgent" ? (
                         <Transaction txPreview={null} txPlan={null} />
-                      )}
+                      ) : null}
                     </div>
                   );
                 }
@@ -215,7 +215,7 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
-                      ) : (
+                      ) : toolName === "askSwapAgent" ? (
                         <Transaction
                           txPreview={
                             stringify &&
@@ -240,7 +240,7 @@ const PurePreviewMessage = ({
                               : null
                           }
                         />
-                      )}
+                      ) : null}
                     </div>
                   );
                 }
