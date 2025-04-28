@@ -10,7 +10,7 @@ import { fetcher, generateUUID } from "@/lib/utils";
 import { Artifact } from "./artifact";
 import { MultimodalInput } from "./multimodal-input";
 import { Messages } from "./messages";
-import { VisibilityType } from "./visibility-selector";
+import type { VisibilityType } from "./visibility-selector";
 import { useArtifactSelector } from "@/hooks/use-artifact";
 import { toast } from "sonner";
 import { useAccount } from "wagmi";
@@ -21,7 +21,7 @@ export function Chat({
   selectedChatModel,
   selectedVisibilityType,
   isReadonly,
-  selectedChatAgent,
+  selectedChatAgent: initialChatAgent,
 }: {
   id: string;
   initialMessages: Array<UIMessage>;
@@ -32,6 +32,8 @@ export function Chat({
 }) {
   const { mutate } = useSWRConfig();
   const { address } = useAccount();
+
+  const [selectedChatAgent, setSelectedChatAgent] = useState(initialChatAgent);
 
   const {
     messages,

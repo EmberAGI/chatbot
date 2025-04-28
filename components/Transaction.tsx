@@ -155,6 +155,8 @@ export function Transaction({
   txPreview: any;
   txPlan: any;
 }) {
+  console.log("[Transaction Component] Received txPreview:", txPreview);
+  console.log("[Transaction Component] Received txPlan:", txPlan);
   const {
     data: txResultData,
     error: txError,
@@ -335,10 +337,13 @@ export function Transaction({
   }
 
   const signMainTransaction = () => {
-    if (!txPlan || !txPreview?.chainId) {
+    const transaction = txPlan?.[txPlan.length - 1];
+    // Check if the transaction and its chainId exist
+    if (!transaction?.chainId) {
       console.error(
-        "[signMainTransaction] txPlan or txPreview.chainId missing."
+        "[signMainTransaction] Final transaction or its chainId missing in txPlan."
       );
+      // Potentially set an error state here if needed
       return;
     }
     if (needsApproval && !isApprovalSuccess) {
@@ -348,17 +353,16 @@ export function Transaction({
       return;
     }
     console.log("[signMainTransaction] Proceeding to sign main transaction.");
-    const transaction = txPlan[txPlan.length - 1];
-    const parsedChainId = parseInt(txPreview.chainId);
-    if (isNaN(parsedChainId)) {
+    // Use chainId from the transaction object
+    const parsedChainId = Number.parseInt(transaction.chainId);
+    if (Number.isNaN(parsedChainId)) {
       console.error(
-        "[signMainTransaction] Invalid chainId in txPreview:",
-        txPreview.chainId
+        "[signMainTransaction] Invalid chainId in transaction:",
+        transaction.chainId
       );
       setApprovalError(
-        new Error(
-          `Invalid chainId in transaction preview: ${txPreview.chainId}`
-        )
+        // Use setApprovalError or a more general error state if appropriate
+        new Error(`Invalid chainId in transaction plan: ${transaction.chainId}`)
       );
       return;
     }
@@ -366,28 +370,30 @@ export function Transaction({
   };
 
   const approveTransaction = () => {
-    if (!needsApproval || !txPlan || !txPreview?.chainId) {
+    const approvalTransaction = txPlan?.[0];
+    // Check if approval is needed and the approval transaction and its chainId exist
+    if (!needsApproval || !approvalTransaction?.chainId) {
       console.log(
-        "[approveTransaction] No approval step needed or txPlan/txPreview.chainId invalid."
+        "[approveTransaction] No approval step needed or approval transaction/chainId invalid."
       );
       return;
     }
     console.log(
       "[approveTransaction] Proceeding to sign approval transaction."
     );
-    const approvalTransaction = txPlan[0];
-    const parsedChainId = parseInt(txPreview.chainId);
-    if (isNaN(parsedChainId)) {
+    // Use chainId from the approval transaction object
+    const parsedChainId = Number.parseInt(approvalTransaction.chainId);
+    if (Number.isNaN(parsedChainId)) {
       console.error(
-        "[approveTransaction] Invalid chainId in txPreview:",
-        txPreview.chainId
+        "[approveTransaction] Invalid chainId in approval transaction:",
+        approvalTransaction.chainId
       );
       setApprovalError(
         new Error(
-          `Invalid chainId in transaction preview: ${txPreview.chainId}`
+          `Invalid chainId in approval transaction plan: ${approvalTransaction.chainId}`
         )
       );
-      setIsApprovalPending(false);
+      setIsApprovalPending(false); // Ensure pending state is reset
       return;
     }
     signTx(approvalTransaction, parsedChainId, true);
@@ -410,7 +416,7 @@ export function Transaction({
               <span className="font-normal">
                 {txPreview?.fromTokenAmount}{" "}
                 {txPreview?.fromTokenAmount &&
-                  txPreview?.fromTokenSymbol.toUpperCase()}
+                  txPreview?.fromTokenSymbol?.toUpperCase()}
                 {" (on "}
                 {txPreview?.fromChain}
                 {")"}
@@ -431,7 +437,7 @@ export function Transaction({
               <span className="font-normal">
                 {txPreview?.toTokenAmount}{" "}
                 {txPreview?.toTokenAmount &&
-                  txPreview?.toTokenSymbol.toUpperCase()}
+                  txPreview?.toTokenSymbol?.toUpperCase()}
                 {" (on "}
                 {txPreview?.toChain}
                 {")"}
@@ -445,8 +451,8 @@ export function Transaction({
             <span className="font-semibold">Exchange Rate:</span>
             <span className="font-normal">
               {txPreview?.exchangeRate}{" "}
-              {txPreview?.fromTokenSymbol.toUpperCase()}/
-              {txPreview?.toTokenSymbol.toUpperCase()}
+              {txPreview?.fromTokenSymbol?.toUpperCase()}/
+              {txPreview?.toTokenSymbol?.toUpperCase()}
             </span>
           </div>
           <div className="border-t border-gray-300 my-2"></div>
@@ -552,9 +558,9 @@ function toBigInt(
     if (typeof value === "string" && value.toLowerCase().includes("e")) {
       const parts = value.toLowerCase().split("e");
       if (parts.length === 2) {
-        const base = parseFloat(parts[0]);
-        const exponent = parseInt(parts[1], 10);
-        if (!isNaN(base) && !isNaN(exponent)) {
+        const base = Number.parseFloat(parts[0]);
+        const exponent = Number.parseInt(parts[1], 10);
+        if (!Number.isNaN(base) && !Number.isNaN(exponent)) {
           return BigInt(Math.round(base * Math.pow(10, exponent)));
         }
       }
