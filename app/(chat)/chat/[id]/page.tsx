@@ -6,9 +6,8 @@ import { Chat } from "@/components/chat";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
 import { DataStreamHandler } from "@/components/data-stream-handler";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
-import { DBMessage } from "@/lib/db/schema";
-import { Attachment, UIMessage } from "ai";
-import { ProviderWrapper } from "@/components/provider-wrapper";
+import type { DBMessage } from "@/lib/db/schema";
+import type { Attachment, UIMessage } from "ai";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -55,34 +54,30 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
   if (!chatModelFromCookie && !agentIdFromCookie) {
     return (
       <>
-        <ProviderWrapper>
-          <Chat
-            id={chat.id}
-            initialMessages={convertToUIMessages(messagesFromDb)}
-            selectedChatModel={DEFAULT_CHAT_MODEL}
-            selectedChatAgent={"all"}
-            selectedVisibilityType={chat.visibility}
-            isReadonly={session?.user?.id !== chat.userId}
-          />
-          <DataStreamHandler id={id} />
-        </ProviderWrapper>
+        <Chat
+          id={chat.id}
+          initialMessages={convertToUIMessages(messagesFromDb)}
+          selectedChatModel={DEFAULT_CHAT_MODEL}
+          selectedChatAgent={"all"}
+          selectedVisibilityType={chat.visibility}
+          isReadonly={session?.user?.id !== chat.userId}
+        />
+        <DataStreamHandler id={id} />
       </>
     );
   }
 
   return (
     <>
-      <ProviderWrapper>
-        <Chat
-          id={chat.id}
-          initialMessages={convertToUIMessages(messagesFromDb)}
-          selectedChatModel={chatModelFromCookie?.value || DEFAULT_CHAT_MODEL}
-          selectedChatAgent={agentIdFromCookie?.value || "all"}
-          selectedVisibilityType={chat.visibility}
-          isReadonly={session?.user?.id !== chat.userId}
-        />
-        <DataStreamHandler id={id} />
-      </ProviderWrapper>
+      <Chat
+        id={chat.id}
+        initialMessages={convertToUIMessages(messagesFromDb)}
+        selectedChatModel={chatModelFromCookie?.value || DEFAULT_CHAT_MODEL}
+        selectedChatAgent={agentIdFromCookie?.value || "all"}
+        selectedVisibilityType={chat.visibility}
+        isReadonly={session?.user?.id !== chat.userId}
+      />
+      <DataStreamHandler id={id} />
     </>
   );
 }
