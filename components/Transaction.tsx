@@ -430,7 +430,7 @@ export function Transaction({
               </span>
             </p>
 
-            <div className="border-t border-gray-300 my-2"></div>
+            <div className="border-t border-gray-500 my-2"></div>
             <span className="font-normal flex gap-3 w-full items-center text-sm">
               To:{" "}
             </span>
