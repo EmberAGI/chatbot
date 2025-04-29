@@ -1,7 +1,6 @@
 import { cookies } from "next/headers";
 
 import { Chat } from "@/components/chat";
-import { ProviderWrapper } from "@/components/provider-wrapper";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { generateUUID } from "@/lib/utils";
 import { DataStreamHandler } from "@/components/data-stream-handler";
@@ -15,36 +14,32 @@ export default async function Page() {
   if (!modelIdFromCookie && !agentIdFromCookie) {
     return (
       <>
-        <ProviderWrapper>
-          <Chat
-            key={id}
-            id={id}
-            initialMessages={[]}
-            selectedChatModel={DEFAULT_CHAT_MODEL}
-            selectedChatAgent={"all"}
-            selectedVisibilityType="private"
-            isReadonly={false}
-          />
-          <DataStreamHandler id={id} />
-        </ProviderWrapper>
+        <Chat
+          key={id}
+          id={id}
+          initialMessages={[]}
+          selectedChatModel={DEFAULT_CHAT_MODEL}
+          selectedChatAgent={"all"}
+          selectedVisibilityType="private"
+          isReadonly={false}
+        />
+        <DataStreamHandler id={id} />
       </>
     );
   }
 
   return (
     <>
-      <ProviderWrapper>
-        <Chat
-          key={id}
-          id={id}
-          initialMessages={[]}
-          selectedChatModel={modelIdFromCookie?.value || DEFAULT_CHAT_MODEL}
-          selectedChatAgent={agentIdFromCookie?.value || "all"}
-          selectedVisibilityType="private"
-          isReadonly={false}
-        />
-        <DataStreamHandler id={id} />
-      </ProviderWrapper>
+      <Chat
+        key={id}
+        id={id}
+        initialMessages={[]}
+        selectedChatModel={modelIdFromCookie?.value || DEFAULT_CHAT_MODEL}
+        selectedChatAgent={agentIdFromCookie?.value || "all"}
+        selectedVisibilityType="private"
+        isReadonly={false}
+      />
+      <DataStreamHandler id={id} />
     </>
   );
 }

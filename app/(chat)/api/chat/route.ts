@@ -70,8 +70,6 @@ export async function POST(request: Request) {
 
     const validatedContext = validationResult.data;
 
-  
-
     if (!session || !session.user || !session.user.id) {
       return new Response('Unauthorized', { status: 401 });
     }
