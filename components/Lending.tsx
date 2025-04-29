@@ -14,6 +14,7 @@ import { useAccount, useSendTransaction, useSwitchChain } from "wagmi";
 // Import all chains from viem/chains - BEWARE of bundle size impact!
 import * as allViemChains from "viem/chains";
 import { FromIcon, ToIcon } from "./icons";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 // === global tuning parameters ===
 const GAS_LIMIT_BUFFER_PCT = 120n; // 120% → +20%
@@ -407,63 +408,22 @@ export function Lending({
         <div className="flex flex-col gap-2 p-4 bg-slate-700 shadow-md rounded-lg text-white border-slate-500 border-2">
           <h2 className="text-lg font-semibold">Transaction Preview</h2>
           <div className="rounded-lg bg-slate-600 p-2 border-slate-500 border-2">
-            <span className="font-semibold flex w-full items-center text-sm">
-              <FromIcon size={16} />
-              From:{" "}
+            <span className="font-semibold flex gap-3 w-full items-center text-sm">
+              Action: {txPreview.action}
             </span>
 
             <p className="font-normal w-full ">
               <span className="font-normal">
-                {txPreview?.fromTokenAmount}{" "}
-                {txPreview?.fromTokenAmount &&
-                  txPreview?.fromTokenSymbol?.toUpperCase()}
+                {txPreview?.amount}{" "}
+                {txPreview?.amount && txPreview?.tokenName?.toUpperCase()}
                 {" (on "}
-                {txPreview?.fromChain}
+                {txPreview?.chainId}
                 {")"}
               </span>
             </p>
-            <p className="font-normal w-full pb-2">
-              <span className="font-normal  text-sm">
-                {txPreview?.fromTokenAddress}{" "}
-              </span>
-            </p>
-
-            <span className="font-semibold flex w-full items-center text-sm">
-              <ToIcon size={16} />
-              To:{" "}
-            </span>
-
-            <p className="font-normal w-full">
-              <span className="font-normal">
-                {txPreview?.toTokenAmount}{" "}
-                {txPreview?.toTokenAmount &&
-                  txPreview?.toTokenSymbol?.toUpperCase()}
-                {" (on "}
-                {txPreview?.toChain}
-                {")"}
-              </span>
-            </p>
-            <p className="font-normal w-full text-sm">
-              <span className="font-normal">{txPreview?.toTokenAddress} </span>
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <span className="font-semibold">Exchange Rate:</span>
-            <span className="font-normal">
-              {txPreview?.exchangeRate}{" "}
-              {txPreview?.fromTokenSymbol?.toUpperCase()}/
-              {txPreview?.toTokenSymbol?.toUpperCase()}
-            </span>
           </div>
           <div className="border-t border-gray-300 my-2"></div>
-          <a
-            href={txPreview?.explorerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-          >
-            Explore Transaction Plan
-          </a>
+
           <div className="border-t border-gray-300 my-2"></div>
           {isConnected ? (
             <>
@@ -541,7 +501,7 @@ export function Lending({
             </>
           ) : (
             <p className="text-red-500 p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
-              Please connect your wallet
+              <ConnectButton />
             </p>
           )}
         </div>
