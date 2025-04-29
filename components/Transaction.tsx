@@ -14,6 +14,7 @@ import { useAccount, useSendTransaction, useSwitchChain } from "wagmi";
 // Import all chains from viem/chains - BEWARE of bundle size impact!
 import * as allViemChains from "viem/chains";
 import { FromIcon, ToIcon } from "./icons";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 // === global tuning parameters ===
 const GAS_LIMIT_BUFFER_PCT = 120n; // 120% → +20%
@@ -541,7 +542,8 @@ export function Transaction({
             </>
           ) : (
             <p className="text-red-500 p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
-              Please connect your wallet
+              <div>Please connect your Wallet to proceed</div>
+              <ConnectButton />
             </p>
           )}
         </div>

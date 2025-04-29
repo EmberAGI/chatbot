@@ -424,7 +424,6 @@ export function Lending({
           </div>
           <div className="border-t border-gray-300 my-2"></div>
 
-          <div className="border-t border-gray-300 my-2"></div>
           {isConnected ? (
             <>
               {isTxSuccess && (
@@ -500,7 +499,8 @@ export function Lending({
               </div>
             </>
           ) : (
-            <p className="text-red-500 p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
+            <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
+              <div>Please connect your Wallet to proceed</div>
               <ConnectButton />
             </p>
           )}
