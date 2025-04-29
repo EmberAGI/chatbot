@@ -424,7 +424,7 @@ export function Transaction({
                 {")"}
               </span>
             </p>
-            <p className="font-normal w-full bg-zinc-700 rounded-full p-2">
+            <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
               <span className="font-normal  text-sm">
                 {txPreview?.fromTokenAddress}{" "}
               </span>
@@ -447,7 +447,7 @@ export function Transaction({
                 {")"}
               </span>
             </p>
-            <p className="font-normal w-full bg-zinc-700 rounded-full p-2">
+            <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
               <span className="font-normal  text-sm">
                 {txPreview?.toTokenAddress}{" "}
               </span>
