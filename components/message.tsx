@@ -20,6 +20,7 @@ import { DocumentPreview } from "./document-preview";
 import { MessageReasoning } from "./message-reasoning";
 import { UseChatHelpers } from "@ai-sdk/react";
 import { Transaction } from "./Transaction";
+import { Lending } from "./Lending";
 
 const PurePreviewMessage = ({
   chatId,
@@ -180,9 +181,11 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
-                      ) : (
+                      ) : toolName === "askSwapAgent" ? (
                         <Transaction txPreview={null} txPlan={null} />
-                      )}
+                      ) : toolName === "askLendingAgent" ? (
+                        <Lending txPreview={null} txPlan={null} />
+                      ) : null}
                     </div>
                   );
                 }
@@ -215,7 +218,7 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
-                      ) : (
+                      ) : toolName === "askSwapAgent" ? (
                         <Transaction
                           txPreview={
                             stringify &&
@@ -240,7 +243,9 @@ const PurePreviewMessage = ({
                               : null
                           }
                         />
-                      )}
+                      ) : toolName === "askLendingAgent" ? (
+                        <Lending txPreview={null} txPlan={null} />
+                      ) : null}
                     </div>
                   );
                 }
