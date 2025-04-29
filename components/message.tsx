@@ -192,11 +192,13 @@ const PurePreviewMessage = ({
 
                 if (state === "result") {
                   const { result } = toolInvocation;
-                  const stringify = toolInvocation?.result?.result?.content
-                    ? JSON.parse(
-                        toolInvocation?.result?.result?.content[0]?.text
-                      )
-                    : null;
+                  const stringify =
+                    toolInvocation?.result?.result?.content &&
+                    toolInvocation?.result?.result?.content[0]
+                      ? JSON.parse(
+                          toolInvocation?.result?.result?.content[0]?.text
+                        )
+                      : null;
                   return (
                     <div key={toolCallId}>
                       {toolName === "getWeather" ? (
