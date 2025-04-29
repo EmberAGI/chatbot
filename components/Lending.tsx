@@ -414,8 +414,8 @@ export function Lending({
 
             <p className="font-normal w-full ">
               <span className="font-normal">
-                {txPreview?.amount}{" "}
                 <span className="font-semibold">
+                  {txPreview?.amount}{" "}
                   {txPreview?.amount && txPreview?.tokenName?.toUpperCase()}
                 </span>
                 {" (on "}

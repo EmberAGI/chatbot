@@ -405,67 +405,55 @@ export function Transaction({
   return (
     <>
       {txPlan && txPreview && (
-        <div className="flex flex-col gap-2 p-4 bg-slate-700 shadow-md rounded-lg text-white border-slate-500 border-2">
-          <h2 className="text-lg font-semibold">Transaction Preview</h2>
-          <div className="rounded-lg bg-slate-600 p-2 border-slate-500 border-2">
-            <span className="font-semibold flex w-full items-center text-sm">
-              <FromIcon size={16} />
+        <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
+          <h2 className="text-lg font-semibold mb-4">Transaction Preview:</h2>
+          <div className="rounded-xl bg-zinc-800 p-4 flex flex-col gap-2">
+            <span className="font-normal flex gap-3 w-full items-center text-sm">
               From:{" "}
             </span>
 
             <p className="font-normal w-full ">
               <span className="font-normal">
-                {txPreview?.fromTokenAmount}{" "}
-                {txPreview?.fromTokenAmount &&
-                  txPreview?.fromTokenSymbol?.toUpperCase()}
+                <span className="font-semibold">
+                  {txPreview?.fromTokenAmount}{" "}
+                  {txPreview?.fromTokenAmount &&
+                    txPreview?.fromTokenSymbol?.toUpperCase()}
+                </span>
                 {" (on "}
                 {txPreview?.fromChain}
                 {")"}
               </span>
             </p>
-            <p className="font-normal w-full pb-2">
+            <p className="font-normal w-full bg-zinc-700 rounded-full p-2">
               <span className="font-normal  text-sm">
                 {txPreview?.fromTokenAddress}{" "}
               </span>
             </p>
 
-            <span className="font-semibold flex w-full items-center text-sm">
-              <ToIcon size={16} />
+            <div className="border-t border-gray-300 my-2"></div>
+            <span className="font-normal flex gap-3 w-full items-center text-sm">
               To:{" "}
             </span>
 
-            <p className="font-normal w-full">
+            <p className="font-normal w-full ">
               <span className="font-normal">
-                {txPreview?.toTokenAmount}{" "}
-                {txPreview?.toTokenAmount &&
-                  txPreview?.toTokenSymbol?.toUpperCase()}
+                <span className="font-semibold">
+                  {txPreview?.toTokenAmount}{" "}
+                  {txPreview?.toTokenAmount &&
+                    txPreview?.toTokenSymbol?.toUpperCase()}
+                </span>
                 {" (on "}
                 {txPreview?.toChain}
                 {")"}
               </span>
             </p>
-            <p className="font-normal w-full text-sm">
-              <span className="font-normal">{txPreview?.toTokenAddress} </span>
+            <p className="font-normal w-full bg-zinc-700 rounded-full p-2">
+              <span className="font-normal  text-sm">
+                {txPreview?.toTokenAddress}{" "}
+              </span>
             </p>
           </div>
-          <div className="flex gap-2">
-            <span className="font-semibold">Exchange Rate:</span>
-            <span className="font-normal">
-              {txPreview?.exchangeRate}{" "}
-              {txPreview?.fromTokenSymbol?.toUpperCase()}/
-              {txPreview?.toTokenSymbol?.toUpperCase()}
-            </span>
-          </div>
-          <div className="border-t border-gray-300 my-2"></div>
-          <a
-            href={txPreview?.explorerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-          >
-            Explore Transaction Plan
-          </a>
-          <div className="border-t border-gray-300 my-2"></div>
+
           {isConnected ? (
             <>
               {isTxSuccess && (
@@ -512,7 +500,7 @@ export function Transaction({
               <div className="flex gap-3">
                 {needsApproval && (
                   <button
-                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                    className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:bg-transparent disabled:border-2 disabled:border-red-200 "
                     type="button"
                     onClick={approveTransaction}
                     disabled={isAnyTxPending || isApprovalSuccess}
@@ -525,7 +513,7 @@ export function Transaction({
                   </button>
                 )}
                 <button
-                  className="mt-4 bg-red-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                  className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:opacity-50"
                   type="button"
                   onClick={signMainTransaction}
                   disabled={
@@ -541,7 +529,7 @@ export function Transaction({
               </div>
             </>
           ) : (
-            <p className="text-red-500 p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
+            <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
               <div>Please connect your Wallet to proceed</div>
               <ConnectButton />
             </p>
