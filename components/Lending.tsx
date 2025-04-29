@@ -471,7 +471,7 @@ export function Lending({
               <div className="flex gap-3">
                 {needsApproval && (
                   <button
-                    className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:bg-transparent disabled:border-2 disabled:border-red-200 "
+                    className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:bg-zinc-600 disabled:border-2 disabled:border-red-200 "
                     type="button"
                     onClick={approveTransaction}
                     disabled={isAnyTxPending || isApprovalSuccess}
