@@ -529,7 +529,7 @@ export function Transaction({
               </div>
             </>
           ) : (
-            <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2">
+            <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col ">
               <div>Please connect your Wallet to proceed</div>
               <ConnectButton />
             </p>
