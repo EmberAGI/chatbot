@@ -1,4 +1,4 @@
-import {
+import type {
   UIMessage,
   appendResponseMessages,
   createDataStreamResponse,
@@ -28,7 +28,7 @@ import { myProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
 import { cookies } from 'next/headers';
 
-import { Session } from 'next-auth';
+import type { Session } from 'next-auth';
 
 import { z } from 'zod';
 
@@ -36,7 +36,6 @@ const ContextSchema = z.object({
   walletAddress: z.string().optional(),
 });
 type Context = z.infer<typeof ContextSchema>;
-
 
 export const maxDuration = 60;
 
@@ -54,8 +53,7 @@ export async function POST(request: Request) {
       context: Context;
     } = await request.json();
 
-
-    const session : Session | null = await auth();
+    const session: Session | null = await auth();
 
     const validationResult = ContextSchema.safeParse(context);
 
@@ -113,27 +111,27 @@ export async function POST(request: Request) {
 
     console.log('Dynamic tools:', dynamicTools);
 
-      return createDataStreamResponse({
+    return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
           model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ 
-            selectedChatModel, 
-            walletAddress: validatedContext.walletAddress 
+          system: systemPrompt({
+            selectedChatModel,
+            walletAddress: validatedContext.walletAddress,
           }),
           messages,
           maxSteps: 20,
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
           tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-            ...dynamicTools
+            //getWeather,
+            //createDocument: createDocument({ session, dataStream }),
+            //updateDocument: updateDocument({ session, dataStream }),
+            //requestSuggestions: requestSuggestions({
+            //  session,
+            //  dataStream,
+            //}),
+            ...dynamicTools,
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
@@ -148,7 +146,7 @@ export async function POST(request: Request) {
                   throw new Error('No assistant message found!');
                 }
 
-                const [,assistantMessage] = appendResponseMessages({
+                const [, assistantMessage] = appendResponseMessages({
                   messages: [userMessage],
                   responseMessages: response.messages,
                 });
@@ -176,7 +174,7 @@ export async function POST(request: Request) {
             functionId: 'stream-text',
           },
         });
-          
+
         console.log('FN RES', result);
 
         result.consumeStream();
@@ -191,9 +189,12 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const JSONerror = JSON.stringify(error, null, 2);
-    return new Response(`An error occurred while processing your request! ${JSONerror}` , {
-      status: 404,
-    });
+    return new Response(
+      `An error occurred while processing your request! ${JSONerror}`,
+      {
+        status: 404,
+      },
+    );
   }
 }
 
