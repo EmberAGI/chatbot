@@ -405,24 +405,25 @@ export function Lending({
   return (
     <>
       {txPlan && txPreview && (
-        <div className="flex flex-col gap-2 p-4 bg-slate-700 shadow-md rounded-lg text-white border-slate-500 border-2">
-          <h2 className="text-lg font-semibold">Transaction Preview</h2>
-          <div className="rounded-lg bg-slate-600 p-2 border-slate-500 border-2">
-            <span className="font-semibold flex gap-3 w-full items-center text-sm">
-              Action: {txPreview.action}
+        <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
+          <h2 className="text-lg font-semibold mb-4">Transaction Preview:</h2>
+          <div className="rounded-xl bg-zinc-800 p-4 flex flex-col gap-2">
+            <span className="font-normal flex gap-3 w-full items-center text-sm">
+              Action: {txPreview.action?.toUpperCase()}
             </span>
 
             <p className="font-normal w-full ">
               <span className="font-normal">
                 {txPreview?.amount}{" "}
-                {txPreview?.amount && txPreview?.tokenName?.toUpperCase()}
+                <span className="font-semibold">
+                  {txPreview?.amount && txPreview?.tokenName?.toUpperCase()}
+                </span>
                 {" (on "}
                 {txPreview?.chainId}
                 {")"}
               </span>
             </p>
           </div>
-          <div className="border-t border-gray-300 my-2"></div>
 
           {isConnected ? (
             <>
@@ -470,7 +471,7 @@ export function Lending({
               <div className="flex gap-3">
                 {needsApproval && (
                   <button
-                    className="mt-4 bg-blue-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                    className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:bg-transparent disabled:border-2 disabled:border-red-200 "
                     type="button"
                     onClick={approveTransaction}
                     disabled={isAnyTxPending || isApprovalSuccess}
@@ -483,7 +484,7 @@ export function Lending({
                   </button>
                 )}
                 <button
-                  className="mt-4 bg-red-500 text-white py-2 px-4 rounded disabled:opacity-50"
+                  className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:opacity-50"
                   type="button"
                   onClick={signMainTransaction}
                   disabled={
