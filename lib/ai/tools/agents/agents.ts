@@ -17,7 +17,7 @@ export const chatAgents: Array<ChatAgent> = [
   },
   {
     id: 'all',
-    name: 'All Agents',
+    name: 'Default Agent',
     description: 'All agents',
     }
     
