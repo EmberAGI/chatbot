@@ -9,16 +9,19 @@ import { cookies } from "next/headers";
 interface SuggestedActionsProps {
   chatId: string;
   append: UseChatHelpers["append"];
+  selectedAgentId?: string;
 }
 
-async function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
-  let suggestedActions = [];
+function PureSuggestedActions({
+  chatId,
+  append,
+  selectedAgentId,
+}: SuggestedActionsProps) {
+  let suggestedActions: any[] = [];
 
-  //get active agent from localstorage
-  const cookieStore = await cookies();
-  const agentIdFromCookie = cookieStore.get("agent");
+  //get  agent from localstorage cookies
 
-  switch (agentIdFromCookie?.value) {
+  switch (selectedAgentId) {
     case "ember-aave":
       suggestedActions = [
         {
