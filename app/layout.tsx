@@ -7,9 +7,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://chat.vercel.ai"),
-  title: "Next.js Chatbot Template",
-  description: "Next.js chatbot template using the AI SDK.",
+  metadataBase: new URL("https://questbook.emberai.xyz"),
+  title: "Questbook Demo",
+  description: "Conversational DeFi",
 };
 
 export const viewport = {
@@ -64,6 +64,14 @@ export default async function RootLayout({
       className={`${geist.variable} ${geistMono.variable}`}
     >
       <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.ico" type="image/icon" sizes="any" />
+        <link
+          rel="apple-touch-icon"
+          href="/favicon.ico"
+          type="image/icon"
+          sizes="any"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: THEME_COLOR_SCRIPT,
