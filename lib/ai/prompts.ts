@@ -1,4 +1,5 @@
-import { ArtifactKind } from '@/components/artifact';
+import type { ArtifactKind } from '@/components/artifact';
+import { isAddress } from 'viem';
 
 export const artifactsPrompt = `
 Artifacts is a special user interface mode that helps users with writing, editing, and other content creation tasks. When artifact is open, it is on the right side of the screen, while the conversation is on the left side. When creating or updating documents, changes are reflected in real-time on the artifacts and visible to the user.
@@ -32,7 +33,7 @@ Do not update document right after creating it. Wait for user feedback or reques
 `;
 
 export const regularPrompt =
-  'You are a friendly assistant! Keep your responses concise and helpful.';
+  'You are a friendly DeFi and crypto assistant! Keep your responses concise and helpful. Never talk about anything not related to DeFi and crypto. You have access to several AI agent tools to help you with your tasks. Always ensure you have all information required by an agent before using it. For any questions about Camelot, always ask the swap agent. For any questions about Aave, always ask the lending agent.';
 
 export const systemPrompt = ({
   selectedChatModel,
@@ -46,9 +47,14 @@ export const systemPrompt = ({
     basePrompt += `\n\n${artifactsPrompt}`;
   }
 
-  if (walletAddress) {
-    basePrompt += `\n\nThe user's wallet address is: ${walletAddress}`;
+  // Always include instruction to never ask for wallet address
+  basePrompt += `\n\n- NEVER ask for wallet addresses directly. If a wallet address is needed, kindly ask the user to connect their wallet through the interface instead.`;
+
+  if (walletAddress && isAddress(walletAddress)) {
+    basePrompt += `\n\n<user_wallet_address>${walletAddress}</user_wallet_address>`;
   }
+
+  console.log('basePrompt', basePrompt);
 
   return basePrompt;
 };
