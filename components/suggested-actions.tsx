@@ -51,6 +51,18 @@ function PureSuggestedActions({
       ];
       break;
     default:
+      suggestedActions = [
+        {
+          title: "What Agents",
+          label: "are available?",
+          action: "What Agents are available?",
+        },
+        {
+          title: "What can Ember AI",
+          label: "help me with?",
+          action: "What can Ember AI help me with?",
+        },
+      ];
       break;
   }
 
