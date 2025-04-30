@@ -1,7 +1,7 @@
-import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { motion } from "framer-motion";
+import Link from "next/link";
 
-import { MessageIcon, VercelIcon } from './icons';
+import { MessageIcon, VercelIcon } from "./icons";
 
 export const Overview = () => {
   return (
@@ -13,20 +13,12 @@ export const Overview = () => {
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ delay: 0.5 }}
     >
-      <div className="rounded-xl p-6 flex flex-col gap-8 leading-relaxed text-center max-w-xl">
-       
-        <p>
-          This is an{' '}
-          <Link
-            className="font-medium underline underline-offset-4"
-            href="https://github.com/vercel/ai-chatbot"
-            target="_blank"
-          >
-            open source
-          </Link>{' '}
-          MCP Agents chat template built with Next.js and the AI SDK by Vercel. 
-        </p>
-       
+      <div className="rounded-xl p-6 flex flex-col gap-0 leading-relaxed text-center max-w-xl">
+        <h1 className="w-full">
+          Welcome to <span className="font-semibold">Ember AI</span>
+        </h1>
+        <h2 className="w-full"> Your web3 assistant</h2>
+        <p className="w-full pt-2">Where should we start ?</p>
       </div>
     </motion.div>
   );

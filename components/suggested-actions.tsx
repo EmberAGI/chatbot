@@ -1,28 +1,70 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Button } from './ui/button';
-import { memo } from 'react';
-import { UseChatHelpers } from '@ai-sdk/react';
+import { motion } from "framer-motion";
+import { Button } from "./ui/button";
+import { memo } from "react";
+import { UseChatHelpers } from "@ai-sdk/react";
+import { cookies } from "next/headers";
 
 interface SuggestedActionsProps {
   chatId: string;
-  append: UseChatHelpers['append'];
+  append: UseChatHelpers["append"];
+  selectedAgentId?: string;
 }
 
-function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
-  const suggestedActions = [
-    {
-      title: 'What are the available Agents',
-      label: 'in MCP tools?',
-      action: 'What are the available agents?',
-    },
-    {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
-    },
-  ];
+function PureSuggestedActions({
+  chatId,
+  append,
+  selectedAgentId,
+}: SuggestedActionsProps) {
+  let suggestedActions: any[] = [];
+
+  //get  agent from localstorage cookies
+
+  switch (selectedAgentId) {
+    case "ember-aave":
+      suggestedActions = [
+        {
+          title: "Provide Liquidity",
+          label: "with A and B",
+          action: "Provide liquidity with A and B",
+        },
+        {
+          title: "Check",
+          label: "Liquidity positions",
+          action: "Check liquidity positions",
+        },
+      ];
+      break;
+    case "ember-camelot":
+      suggestedActions = [
+        {
+          title: "Swap A for B",
+          label: "on X Network.",
+          action: "Swap A for B tokens on X Network.",
+        },
+        {
+          title: "Buy X",
+          label: "",
+          action: "Buy X token.",
+        },
+      ];
+      break;
+    default:
+      suggestedActions = [
+        {
+          title: "What Agents",
+          label: "are available?",
+          action: "What Agents are available?",
+        },
+        {
+          title: "What can Ember AI",
+          label: "help me with?",
+          action: "What can Ember AI help me with?",
+        },
+      ];
+      break;
+  }
 
   return (
     <div
@@ -36,15 +78,15 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
           exit={{ opacity: 0, y: 20 }}
           transition={{ delay: 0.05 * index }}
           key={`suggested-action-${suggestedAction.title}-${index}`}
-          className={index > 1 ? 'hidden sm:block' : 'block'}
+          className={index > 1 ? "hidden sm:block" : "block"}
         >
           <Button
             variant="ghost"
             onClick={async () => {
-              window.history.replaceState({}, '', `/chat/${chatId}`);
+              window.history.replaceState({}, "", `/chat/${chatId}`);
 
               append({
-                role: 'user',
+                role: "user",
                 content: suggestedAction.action,
               });
             }}

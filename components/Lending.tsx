@@ -149,7 +149,7 @@ async function withSafeDefaults(
   }
 }
 
-export function Transaction({
+export function Lending({
   txPreview,
   txPlan,
 }: {
@@ -409,47 +409,18 @@ export function Transaction({
           <h2 className="text-lg font-semibold mb-4">Transaction Preview:</h2>
           <div className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2">
             <span className="font-normal flex gap-3 w-full items-center text-sm">
-              From:{" "}
+              Action: {txPreview.action?.toUpperCase()}
             </span>
 
             <p className="font-normal w-full ">
               <span className="font-normal">
                 <span className="font-semibold">
-                  {txPreview?.fromTokenAmount}{" "}
-                  {txPreview?.fromTokenAmount &&
-                    txPreview?.fromTokenSymbol?.toUpperCase()}
+                  {txPreview?.amount}{" "}
+                  {txPreview?.amount && txPreview?.tokenName?.toUpperCase()}
                 </span>
                 {" (on "}
-                {txPreview?.fromChain}
+                {txPreview?.chainId}
                 {")"}
-              </span>
-            </p>
-            <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
-              <span className="font-normal  text-sm">
-                {txPreview?.fromTokenAddress}{" "}
-              </span>
-            </p>
-
-            <div className="border-t border-gray-500 my-2"></div>
-            <span className="font-normal flex gap-3 w-full items-center text-sm">
-              To:{" "}
-            </span>
-
-            <p className="font-normal w-full ">
-              <span className="font-normal">
-                <span className="font-semibold">
-                  {txPreview?.toTokenAmount}{" "}
-                  {txPreview?.toTokenAmount &&
-                    txPreview?.toTokenSymbol?.toUpperCase()}
-                </span>
-                {" (on "}
-                {txPreview?.toChain}
-                {")"}
-              </span>
-            </p>
-            <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
-              <span className="font-normal  text-sm">
-                {txPreview?.toTokenAddress}{" "}
               </span>
             </p>
           </div>
@@ -529,7 +500,7 @@ export function Transaction({
               </div>
             </>
           ) : (
-            <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col ">
+            <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col">
               <div className="mb-2">Please connect your Wallet to proceed</div>
               <ConnectButton />
             </p>

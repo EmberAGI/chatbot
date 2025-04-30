@@ -20,6 +20,7 @@ import { DocumentPreview } from "./document-preview";
 import { MessageReasoning } from "./message-reasoning";
 import { UseChatHelpers } from "@ai-sdk/react";
 import { Transaction } from "./Transaction";
+import { Lending } from "./Lending";
 
 const PurePreviewMessage = ({
   chatId,
@@ -44,7 +45,7 @@ const PurePreviewMessage = ({
     <AnimatePresence>
       <motion.div
         data-testid={`message-${message.role}`}
-        className="w-full mx-auto max-w-3xl px-4 group/message"
+        className="w-full mx-auto max-w-3xl px-4 group/message font-mono"
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role={message.role}
@@ -180,20 +181,24 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
-                      ) : (
+                      ) : toolName === "askSwapAgent" ? (
                         <Transaction txPreview={null} txPlan={null} />
-                      )}
+                      ) : toolName === "askLendingAgent" ? (
+                        <Lending txPreview={null} txPlan={null} />
+                      ) : null}
                     </div>
                   );
                 }
 
                 if (state === "result") {
                   const { result } = toolInvocation;
-                  const stringify = toolInvocation?.result?.result?.content
-                    ? JSON.parse(
-                        toolInvocation?.result?.result?.content[0]?.text
-                      )
-                    : null;
+                  const stringify =
+                    toolInvocation?.result?.result?.content &&
+                    toolInvocation?.result?.result?.content[0]
+                      ? JSON.parse(
+                          toolInvocation?.result?.result?.content[0]?.text
+                        )
+                      : null;
                   return (
                     <div key={toolCallId}>
                       {toolName === "getWeather" ? (
@@ -215,7 +220,7 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
-                      ) : (
+                      ) : toolName === "askSwapAgent" ? (
                         <Transaction
                           txPreview={
                             stringify &&
@@ -240,7 +245,32 @@ const PurePreviewMessage = ({
                               : null
                           }
                         />
-                      )}
+                      ) : toolName === "askLendingAgent" ? (
+                        <Lending
+                          txPreview={
+                            stringify &&
+                            stringify?.artifacts &&
+                            stringify?.artifacts[0]?.parts &&
+                            stringify?.artifacts[0]?.parts[0]?.data
+                              ? JSON.parse(
+                                  toolInvocation?.result?.result?.content[0]
+                                    ?.text
+                                )?.artifacts[0]?.parts[0]?.data?.txPreview
+                              : null
+                          }
+                          txPlan={
+                            stringify &&
+                            stringify?.artifacts &&
+                            stringify?.artifacts[0]?.parts &&
+                            stringify?.artifacts[0]?.parts[0]?.data
+                              ? JSON.parse(
+                                  toolInvocation?.result?.result?.content[0]
+                                    ?.text
+                                )?.artifacts[0]?.parts[0]?.data?.txPlan
+                              : null
+                          }
+                        />
+                      ) : null}
                     </div>
                   );
                 }
