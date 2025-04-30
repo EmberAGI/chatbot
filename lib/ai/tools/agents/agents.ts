@@ -21,6 +21,11 @@ export const chatAgents: Array<ChatAgent> = [
     description: 'Camelot Liquidity Provisioning agent',
   },
   {
+    id: 'ember-pendle',
+    name: 'Pendle',
+    description: 'Test agent for Pendle',
+  },
+  {
     id: 'all',
     name: 'Default Agent',
     description: 'All agents',
