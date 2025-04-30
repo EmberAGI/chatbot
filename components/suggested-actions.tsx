@@ -26,8 +26,8 @@ function PureSuggestedActions({
       suggestedActions = [
         {
           title: "Provide Liquidity",
-          label: "with A and B",
-          action: "Provide liquidity with A and B",
+          label: "with ETH and USDC",
+          action: "Provide liquidity with ETH and USDC",
         },
         {
           title: "Check",
@@ -39,14 +39,14 @@ function PureSuggestedActions({
     case "ember-camelot":
       suggestedActions = [
         {
-          title: "Swap A for B",
-          label: "on X Network.",
+          title: "Swap USDC for ETH",
+          label: "on Arbitrum Network.",
           action: "Swap A for B tokens on X Network.",
         },
         {
-          title: "Buy X",
+          title: "Buy ARB",
           label: "",
-          action: "Buy X token.",
+          action: "Buy ARB token.",
         },
       ];
       break;
