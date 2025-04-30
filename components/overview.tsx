@@ -17,8 +17,8 @@ export const Overview = () => {
         <h1 className="w-full">
           Welcome to <span className="font-semibold">Ember AI</span>
         </h1>
-        <h2 className="w-full pt-2"> Your web3 assistant</h2>
-        <p>Where should we start ?</p>
+        <h2 className="w-full"> Your web3 assistant</h2>
+        <p className="w-full pt-2">Where should we start ?</p>
       </div>
     </motion.div>
   );
