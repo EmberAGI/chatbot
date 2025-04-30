@@ -7,13 +7,23 @@ interface ChatAgent {
 export const chatAgents: Array<ChatAgent> = [
     {
       id: 'ember-aave',
-      name: 'AAVE',
+      name: 'Lending',
       description: 'AAVE lending agent',
     },
     {
       id: 'ember-camelot',
-      name: 'Camelot',
+      name: 'Trading',
       description: 'Camelot Swapping agent',
+  },
+  {
+    id: 'ember-lp',
+    name: 'LPing',
+    description: 'Camelot Liquidity Provisioning agent',
+  },
+  {
+    id: 'ember-pendle',
+    name: 'Pendle',
+    description: 'Test agent for Pendle',
   },
   {
     id: 'all',

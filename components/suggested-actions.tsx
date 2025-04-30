@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { memo } from "react";
 import { UseChatHelpers } from "@ai-sdk/react";
-import { cookies } from "next/headers";
 
 interface SuggestedActionsProps {
   chatId: string;
@@ -47,6 +46,20 @@ function PureSuggestedActions({
           title: "Buy ARB",
           label: "",
           action: "Buy ARB token.",
+        },
+      ];
+      break;
+    case "ember-lp":
+      suggestedActions = [
+        {
+          title: "Provide Liquidity",
+          label: "on Arbitrum Network.",
+          action: "Provide Liquidity on Arbitrum Network.",
+        },
+        {
+          title: "Check Positions",
+          label: "",
+          action: "Check Positions",
         },
       ];
       break;
