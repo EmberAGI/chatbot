@@ -13,11 +13,11 @@ export const Overview = () => {
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ delay: 0.5 }}
     >
-      <div className="rounded-xl p-6 flex flex-col gap-8 leading-relaxed text-center max-w-xl">
+      <div className="rounded-xl p-6 flex flex-col gap-0 leading-relaxed text-center max-w-xl">
         <h1 className="w-full">
           Welcome to <span className="font-semibold">Ember AI</span>
         </h1>
-        <h2 className="w-full"> Your web3 assistant</h2>
+        <h2 className="w-full pt-2"> Your web3 assistant</h2>
         <p>Where should we start ?</p>
       </div>
     </motion.div>
