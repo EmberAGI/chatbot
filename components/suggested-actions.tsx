@@ -24,14 +24,14 @@ function PureSuggestedActions({
     case "ember-aave":
       suggestedActions = [
         {
-          title: "Provide Liquidity",
-          label: "with ETH and USDC",
-          action: "Provide liquidity with ETH and USDC",
+          title: "Deposit WETH",
+          label: "to my balance",
+          action: "Deposit WETH to my balance",
         },
         {
           title: "Check",
-          label: "Liquidity positions",
-          action: "Check liquidity positions",
+          label: "balance",
+          action: "Check balance",
         },
       ];
       break;
@@ -44,7 +44,7 @@ function PureSuggestedActions({
         },
         {
           title: "Buy ARB",
-          label: "",
+          label: "on Arbitrum Network.",
           action: "Buy ARB token.",
         },
       ];
@@ -57,8 +57,8 @@ function PureSuggestedActions({
           action: "Provide Liquidity on Arbitrum Network.",
         },
         {
-          title: "Check Positions",
-          label: "",
+          title: "Check",
+          label: "Liquidity positions",
           action: "Check Positions",
         },
       ];
@@ -103,7 +103,7 @@ function PureSuggestedActions({
                 content: suggestedAction.action,
               });
             }}
-            className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
+            className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start border-muted-foreground"
           >
             <span className="font-medium">{suggestedAction.title}</span>
             <span className="text-muted-foreground">
