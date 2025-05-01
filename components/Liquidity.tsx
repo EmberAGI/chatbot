@@ -419,7 +419,7 @@ export function Liquidity({
       {
         <div className="p-0 m-0">
           <>
-            {positions && (
+            {positions ? (
               <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
                 <h2 className="text-lg font-semibold mb-4">
                   Liquidity Positions
@@ -464,10 +464,10 @@ export function Liquidity({
                   </div>
                 ))}
               </div>
-            )}
+            ) : null}
           </>
 
-          {isConnected ? (
+          {!positions && isConnected ? (
             <>
               {isTxSuccess && (
                 <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
@@ -544,10 +544,14 @@ export function Liquidity({
               </div>
             </>
           ) : (
-            <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col ">
-              <div className="mb-2">Please connect your Wallet to proceed</div>
-              <ConnectButton />
-            </p>
+            !positions && (
+              <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col ">
+                <div className="mb-2">
+                  Please connect your Wallet to proceed
+                </div>
+                <ConnectButton />
+              </p>
+            )
           )}
         </div>
       }
