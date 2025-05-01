@@ -40,7 +40,7 @@ function PureSuggestedActions({
         {
           title: "Swap USDC for ETH",
           label: "on Arbitrum Network.",
-          action: "Swap A for B tokens on X Network.",
+          action: "Swap USDC for ETH tokens from Arbitrum to Arbitrum Network.",
         },
         {
           title: "Buy ARB",
