@@ -30,7 +30,6 @@ export function SidebarToggle({
         </TooltipTrigger>
         <TooltipContent align="start">Toggle Sidebar</TooltipContent>
       </Tooltip>
-      <ConnectButton />
     </>
   );
 }
