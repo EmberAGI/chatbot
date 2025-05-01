@@ -187,7 +187,11 @@ const PurePreviewMessage = ({
                       ) : toolName === "askLendingAgent" ? (
                         <Lending txPreview={null} txPlan={null} />
                       ) : toolName === "askLiquidityAgent" ? (
-                        <Liquidity positions={null} />
+                        <Liquidity
+                          positions={null}
+                          txPreview={null}
+                          txPlan={null}
+                        />
                       ) : null}
                     </div>
                   );
@@ -284,6 +288,28 @@ const PurePreviewMessage = ({
                                   toolInvocation?.result?.result?.content[0]
                                     ?.text
                                 )?.artifacts[0]?.parts[0]?.data?.positions
+                              : null
+                          }
+                          txPreview={
+                            stringify &&
+                            stringify?.artifacts &&
+                            stringify?.artifacts[0]?.parts &&
+                            stringify?.artifacts[0]?.parts[0]?.data
+                              ? JSON.parse(
+                                  toolInvocation?.result?.result?.content[0]
+                                    ?.text
+                                )?.artifacts[0]?.parts[0]?.data?.txPreview
+                              : null
+                          }
+                          txPlan={
+                            stringify &&
+                            stringify?.artifacts &&
+                            stringify?.artifacts[0]?.parts &&
+                            stringify?.artifacts[0]?.parts[0]?.data
+                              ? JSON.parse(
+                                  toolInvocation?.result?.result?.content[0]
+                                    ?.text
+                                )?.artifacts[0]?.parts[0]?.data?.txPlan
                               : null
                           }
                         />
