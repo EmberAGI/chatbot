@@ -10,7 +10,7 @@ interface IPosition {
   price: string;
 }
 
-export function Liquidity({ positions }: { positions: IPosition[] }) {
+export function Liquidity({ positions }: { positions: IPosition[] | null }) {
   return (
     <>
       {positions && (

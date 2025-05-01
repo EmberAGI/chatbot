@@ -21,6 +21,7 @@ import { MessageReasoning } from "./message-reasoning";
 import { UseChatHelpers } from "@ai-sdk/react";
 import { Transaction } from "./Transaction";
 import { Lending } from "./Lending";
+import { Liquidity } from "./Liquidity";
 
 const PurePreviewMessage = ({
   chatId,
@@ -186,7 +187,7 @@ const PurePreviewMessage = ({
                       ) : toolName === "askLendingAgent" ? (
                         <Lending txPreview={null} txPlan={null} />
                       ) : toolName === "askLiquidityAgent" ? (
-                        <Transaction txPreview={null} txPlan={null} />
+                        <Liquidity positions={null} />
                       ) : null}
                     </div>
                   );
@@ -273,8 +274,8 @@ const PurePreviewMessage = ({
                           }
                         />
                       ) : toolName === "askLiquidityAgent" ? (
-                        <Transaction
-                          txPreview={
+                        <Liquidity
+                          positions={
                             stringify &&
                             stringify?.artifacts &&
                             stringify?.artifacts[0]?.parts &&
@@ -282,18 +283,7 @@ const PurePreviewMessage = ({
                               ? JSON.parse(
                                   toolInvocation?.result?.result?.content[0]
                                     ?.text
-                                )?.artifacts[0]?.parts[0]?.data?.txPreview
-                              : null
-                          }
-                          txPlan={
-                            stringify &&
-                            stringify?.artifacts &&
-                            stringify?.artifacts[0]?.parts &&
-                            stringify?.artifacts[0]?.parts[0]?.data
-                              ? JSON.parse(
-                                  toolInvocation?.result?.result?.content[0]
-                                    ?.text
-                                )?.artifacts[0]?.parts[0]?.data?.txPlan
+                                )?.artifacts[0]?.parts[0]?.data?.positions
                               : null
                           }
                         />
