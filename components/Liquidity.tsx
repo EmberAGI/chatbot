@@ -417,7 +417,7 @@ export function Liquidity({
   return (
     <>
       {
-        <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
+        <div className="p-0 m-0">
           <>
             {positions && (
               <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
