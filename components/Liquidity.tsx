@@ -469,134 +469,136 @@ export function Liquidity({
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
-                <h2 className="text-lg font-semibold mb-4">
-                  ACTION: {txPreview?.action}
-                </h2>
-                <div className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2">
-                  <span className="font-normal flex gap-3 w-full items-center text-sm">
-                    {txPreview?.action}{" "}
-                    <span className="text-xs text-gray-400">
-                      {txPreview?.pairHandle}
+              txPreview?.action && (
+                <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
+                  <h2 className="text-lg font-semibold mb-4">
+                    Liquidity Provision
+                  </h2>
+                  <div className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2">
+                    <span className="font-normal flex gap-3 w-full items-center text-sm">
+                      {txPreview?.action?.toUpperCase()}{" "}
+                      <span className="text-xs text-gray-400">
+                        {txPreview?.pairHandle}
+                      </span>
                     </span>
-                  </span>
 
-                  <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
-                    <span className="font-normal text-sm flex flex-col">
-                      <span className="font-semibold w-full text-xl">
-                        {txPreview?.token0Amount}{" "}
-                        {txPreview?.token0Amount &&
-                          txPreview?.token0Symbol?.toUpperCase()}
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
+                      <span className="font-normal text-sm flex flex-col">
+                        <span className="font-semibold w-full text-xl">
+                          {txPreview?.token0Amount}{" "}
+                          {txPreview?.token0Amount &&
+                            txPreview?.token0Symbol?.toUpperCase()}
+                        </span>
+                      </span>
+                    </p>
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
+                      <span className="font-normal text-sm flex flex-col">
+                        <span className="font-semibold w-full text-xl">
+                          {txPreview?.token1Amount}{" "}
+                          {txPreview?.token1Amount &&
+                            txPreview?.token1Symbol?.toUpperCase()}
+                        </span>
+                      </span>
+                    </p>
+                    <span className="font-normal flex gap-3 w-full items-center text-sm">
+                      <span className="text-md text-gray-400">
+                        Price: {txPreview?.priceFrom} {" - "}{" "}
+                        {txPreview?.priceTo}
                       </span>
                     </span>
-                  </p>
-                  <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
-                    <span className="font-normal text-sm flex flex-col">
-                      <span className="font-semibold w-full text-xl">
-                        {txPreview?.token1Amount}{" "}
-                        {txPreview?.token1Amount &&
-                          txPreview?.token1Symbol?.toUpperCase()}
-                      </span>
-                    </span>
-                  </p>
-                  <span className="font-normal flex gap-3 w-full items-center text-sm">
-                    <span className="text-md text-gray-400">
-                      Price: {txPreview?.priceFrom} {txPreview?.priceTo}
-                    </span>
-                  </span>
+                  </div>
+                  {!positions && txPlan && txPreview && isConnected ? (
+                    <>
+                      {isTxSuccess && (
+                        <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
+                          Transaction Successful!
+                        </p>
+                      )}
+                      {isTxPending && (!needsApproval || isApprovalSuccess) && (
+                        <p className=" p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2 text-slate-800">
+                          Executing Transaction...
+                        </p>
+                      )}
+                      {txError && (
+                        <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white break-words">
+                          Execution Error!{" "}
+                          {(txError as any).shortMessage ||
+                            txError.message ||
+                            JSON.stringify(txError, null, 2)}
+                        </p>
+                      )}
+
+                      {needsApproval && isApprovalPending && (
+                        <p className=" p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2 text-slate-800">
+                          Processing Approval...
+                        </p>
+                      )}
+                      {needsApproval && approvalError && (
+                        <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white break-words">
+                          Approval Error!{" "}
+                          {(approvalError as any).shortMessage ||
+                            approvalError.message ||
+                            JSON.stringify(approvalError, null, 2)}
+                        </p>
+                      )}
+                      {needsApproval &&
+                        isApprovalSuccess &&
+                        !isTxSuccess &&
+                        !isTxPending && (
+                          <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
+                            Approval Sent! Ready to execute.
+                          </p>
+                        )}
+
+                      <div className="flex gap-3">
+                        {needsApproval && (
+                          <button
+                            className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:bg-zinc-600 disabled:border-2 disabled:border-red-200 "
+                            type="button"
+                            onClick={approveTransaction}
+                            disabled={isAnyTxPending || isApprovalSuccess}
+                          >
+                            {isApprovalPending
+                              ? "Approving..."
+                              : isApprovalSuccess
+                              ? "Approved"
+                              : "Approve Transaction"}
+                          </button>
+                        )}
+                        <button
+                          className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:opacity-50"
+                          type="button"
+                          onClick={signMainTransaction}
+                          disabled={
+                            isAnyTxPending ||
+                            (needsApproval && !isApprovalSuccess) ||
+                            false
+                          }
+                        >
+                          {isTxPending
+                            ? "Executing..."
+                            : needsApproval
+                            ? "Execute Transaction"
+                            : "Sign Transaction"}
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    !positions &&
+                    txPlan &&
+                    txPreview && (
+                      <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col ">
+                        <div className="mb-2">
+                          Please connect your Wallet to proceed
+                        </div>
+                        <ConnectButton />
+                      </p>
+                    )
+                  )}
                 </div>
-              </div>
+              )
             )}
           </>
-
-          {!positions && txPlan && txPreview && isConnected ? (
-            <>
-              {isTxSuccess && (
-                <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
-                  Transaction Successful!
-                </p>
-              )}
-              {isTxPending && (!needsApproval || isApprovalSuccess) && (
-                <p className=" p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2 text-slate-800">
-                  Executing Transaction...
-                </p>
-              )}
-              {txError && (
-                <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white break-words">
-                  Execution Error!{" "}
-                  {(txError as any).shortMessage ||
-                    txError.message ||
-                    JSON.stringify(txError, null, 2)}
-                </p>
-              )}
-
-              {needsApproval && isApprovalPending && (
-                <p className=" p-2 rounded-2xl border-gray-400 bg-gray-200 w-full border-2 text-slate-800">
-                  Processing Approval...
-                </p>
-              )}
-              {needsApproval && approvalError && (
-                <p className=" p-2 rounded-2xl border-red-800 bg-red-400 w-full border-2 text-white break-words">
-                  Approval Error!{" "}
-                  {(approvalError as any).shortMessage ||
-                    approvalError.message ||
-                    JSON.stringify(approvalError, null, 2)}
-                </p>
-              )}
-              {needsApproval &&
-                isApprovalSuccess &&
-                !isTxSuccess &&
-                !isTxPending && (
-                  <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
-                    Approval Sent! Ready to execute.
-                  </p>
-                )}
-
-              <div className="flex gap-3">
-                {needsApproval && (
-                  <button
-                    className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:bg-zinc-600 disabled:border-2 disabled:border-red-200 "
-                    type="button"
-                    onClick={approveTransaction}
-                    disabled={isAnyTxPending || isApprovalSuccess}
-                  >
-                    {isApprovalPending
-                      ? "Approving..."
-                      : isApprovalSuccess
-                      ? "Approved"
-                      : "Approve Transaction"}
-                  </button>
-                )}
-                <button
-                  className="mt-4 bg-orange-500 text-white py-2 px-4 rounded-full disabled:opacity-50"
-                  type="button"
-                  onClick={signMainTransaction}
-                  disabled={
-                    isAnyTxPending ||
-                    (needsApproval && !isApprovalSuccess) ||
-                    false
-                  }
-                >
-                  {isTxPending
-                    ? "Executing..."
-                    : needsApproval
-                    ? "Execute Transaction"
-                    : "Sign Transaction"}
-                </button>
-              </div>
-            </>
-          ) : (
-            !positions &&
-            txPlan &&
-            txPreview && (
-              <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col ">
-                <div className="mb-2">
-                  Please connect your Wallet to proceed
-                </div>
-                <ConnectButton />
-              </p>
-            )
-          )}
         </div>
       }
     </>
