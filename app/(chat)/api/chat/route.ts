@@ -1,7 +1,5 @@
-import type {
-  UIMessage,
-} from 'ai';
-import  {
+import type { UIMessage } from 'ai';
+import {
   createDataStreamResponse,
   appendResponseMessages,
   smoothStream,
@@ -26,7 +24,7 @@ import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
-import { myProvider } from '@/lib/ai/providers';
+import { openRouterProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
 import { cookies } from 'next/headers';
 
@@ -116,7 +114,7 @@ export async function POST(request: Request) {
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
+          model: openRouterProvider.languageModel(selectedChatModel),
           system: systemPrompt({
             selectedChatModel,
             walletAddress: validatedContext.walletAddress,
