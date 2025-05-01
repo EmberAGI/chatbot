@@ -436,38 +436,80 @@ export function Liquidity({
                       </span>
                     </span>
 
-                    <p className="font-normal w-full bg-zinc-600 rounded-full p-4 ">
-                      <span className="font-normal text-sm">
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
+                      <span className="font-normal text-sm flex flex-col">
                         <span className="font-semibold w-full text-xl">
                           {x.amount0} {x.amount0 && x.symbol0?.toUpperCase()}
                         </span>
-                        {" (on "}
-                        {x.providerId?.toUpperCase()}
-                        {")"}
+                        <span>
+                          {" (on "}
+                          {x.providerId?.toUpperCase()}
+                          {")"}
+                        </span>
                       </span>
                     </p>
-                    <p className="font-normal w-full bg-zinc-600 rounded-full p-4 ">
-                      <span className="font-normal text-sm">
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
+                      <span className="font-normal text-sm flex flex-col">
                         <span className="font-semibold w-full text-xl">
                           {x.amount1} {x.amount1 && x.symbol1?.toUpperCase()}
                         </span>
-                        {" (on "}
-                        {x.providerId?.toUpperCase()}
-                        {")"}
+                        <span>
+                          {" (on "}
+                          {x.providerId?.toUpperCase()}
+                          {")"}
+                        </span>
                       </span>
                     </p>
                     <span className="font-normal flex gap-3 w-full items-center text-sm">
-                      <span className="text-xs text-gray-400">
+                      <span className="text-md text-gray-400">
                         Price: {x.price}
                       </span>
                     </span>
                   </div>
                 ))}
               </div>
-            ) : null}
+            ) : (
+              <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
+                <h2 className="text-lg font-semibold mb-4">
+                  ACTION: {txPreview?.action}
+                </h2>
+                <div className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2">
+                  <span className="font-normal flex gap-3 w-full items-center text-sm">
+                    {txPreview?.action}{" "}
+                    <span className="text-xs text-gray-400">
+                      {txPreview?.pairHandle}
+                    </span>
+                  </span>
+
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
+                    <span className="font-normal text-sm flex flex-col">
+                      <span className="font-semibold w-full text-xl">
+                        {txPreview?.token0Amount}{" "}
+                        {txPreview?.token0Amount &&
+                          txPreview?.token0Symbol?.toUpperCase()}
+                      </span>
+                    </span>
+                  </p>
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-5 px-8 ">
+                    <span className="font-normal text-sm flex flex-col">
+                      <span className="font-semibold w-full text-xl">
+                        {txPreview?.token1Amount}{" "}
+                        {txPreview?.token1Amount &&
+                          txPreview?.token1Symbol?.toUpperCase()}
+                      </span>
+                    </span>
+                  </p>
+                  <span className="font-normal flex gap-3 w-full items-center text-sm">
+                    <span className="text-md text-gray-400">
+                      Price: {txPreview?.priceFrom} {txPreview?.priceTo}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            )}
           </>
 
-          {!positions && isConnected ? (
+          {!positions && txPlan && txPreview && isConnected ? (
             <>
               {isTxSuccess && (
                 <p className=" p-2 rounded-2xl border-green-800 bg-green-200 w-full border-2 text-green-800">
@@ -544,7 +586,9 @@ export function Liquidity({
               </div>
             </>
           ) : (
-            !positions && (
+            !positions &&
+            txPlan &&
+            txPreview && (
               <p className="text-red-500 p-2 flex rounded-2xl border-gray-400 bg-gray-200 w-full border-2 flex-col ">
                 <div className="mb-2">
                   Please connect your Wallet to proceed
