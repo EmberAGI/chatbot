@@ -18,8 +18,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { MessageEditor } from "./message-editor";
 import { DocumentPreview } from "./document-preview";
 import { MessageReasoning } from "./message-reasoning";
-import { UseChatHelpers } from "@ai-sdk/react";
-import { Transaction } from "./Transaction";
+import type { UseChatHelpers } from "@ai-sdk/react";
+import { Transaction } from "./Swaps";
 import { Lending } from "./Lending";
 import { Liquidity } from "./Liquidity";
 
@@ -199,13 +199,11 @@ const PurePreviewMessage = ({
 
                 if (state === "result") {
                   const { result } = toolInvocation;
-                  const stringify =
-                    toolInvocation?.result?.result?.content &&
-                    toolInvocation?.result?.result?.content[0]
-                      ? JSON.parse(
-                          toolInvocation?.result?.result?.content[0]?.text
-                        )
-                      : null;
+                  const stringify = toolInvocation?.result?.result?.content[0]
+                    ? JSON.parse(
+                        toolInvocation?.result?.result?.content[0]?.text
+                      )
+                    : null;
 
                   return (
                     <div key={toolCallId}>
@@ -231,9 +229,6 @@ const PurePreviewMessage = ({
                       ) : toolName === "askSwapAgent" ? (
                         <Transaction
                           txPreview={
-                            stringify &&
-                            stringify?.artifacts &&
-                            stringify?.artifacts[0]?.parts &&
                             stringify?.artifacts[0]?.parts[0]?.data
                               ? JSON.parse(
                                   toolInvocation?.result?.result?.content[0]
@@ -242,9 +237,6 @@ const PurePreviewMessage = ({
                               : null
                           }
                           txPlan={
-                            stringify &&
-                            stringify?.artifacts &&
-                            stringify?.artifacts[0]?.parts &&
                             stringify?.artifacts[0]?.parts[0]?.data
                               ? JSON.parse(
                                   toolInvocation?.result?.result?.content[0]
@@ -257,9 +249,6 @@ const PurePreviewMessage = ({
                         stringify && (
                           <Lending
                             txPreview={
-                              stringify &&
-                              stringify?.artifacts &&
-                              stringify?.artifacts[0]?.parts &&
                               stringify?.artifacts[0]?.parts[0]?.data
                                 ? JSON.parse(
                                     toolInvocation?.result?.result?.content[0]
@@ -268,9 +257,6 @@ const PurePreviewMessage = ({
                                 : null
                             }
                             txPlan={
-                              stringify &&
-                              stringify?.artifacts &&
-                              stringify?.artifacts[0]?.parts &&
                               stringify?.artifacts[0]?.parts[0]?.data
                                 ? JSON.parse(
                                     toolInvocation?.result?.result?.content[0]
@@ -284,9 +270,6 @@ const PurePreviewMessage = ({
                         stringify && (
                           <Liquidity
                             positions={
-                              stringify &&
-                              stringify?.artifacts &&
-                              stringify?.artifacts[0]?.parts &&
                               stringify?.artifacts[0]?.parts[0]?.data
                                 ? JSON.parse(
                                     toolInvocation?.result?.result?.content[0]
@@ -295,9 +278,6 @@ const PurePreviewMessage = ({
                                 : null
                             }
                             txPreview={
-                              stringify &&
-                              stringify?.artifacts &&
-                              stringify?.artifacts[0]?.parts &&
                               stringify?.artifacts[0]?.parts[0]?.data
                                 ? JSON.parse(
                                     toolInvocation?.result?.result?.content[0]
@@ -306,9 +286,6 @@ const PurePreviewMessage = ({
                                 : null
                             }
                             txPlan={
-                              stringify &&
-                              stringify?.artifacts &&
-                              stringify?.artifacts[0]?.parts &&
                               stringify?.artifacts[0]?.parts[0]?.data
                                 ? JSON.parse(
                                     toolInvocation?.result?.result?.content[0]
