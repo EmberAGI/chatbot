@@ -44,7 +44,8 @@ export const systemPrompt = ({
 }) => {
   let basePrompt = regularPrompt;
   if (selectedChatModel !== 'chat-model-reasoning') {
-    basePrompt += `\n\n${artifactsPrompt}`;
+    // Add prompt for more advanced capabilities here
+    //basePrompt += `\n\n${artifactsPrompt}`;
   }
 
   // Always include instruction to never ask for wallet address
