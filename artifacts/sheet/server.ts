@@ -1,4 +1,4 @@
-import { myProvider } from '@/lib/ai/providers';
+import { openRouterProvider } from '@/lib/ai/providers';
 import { sheetPrompt, updateDocumentPrompt } from '@/lib/ai/prompts';
 import { createDocumentHandler } from '@/lib/artifacts/server';
 import { streamObject } from 'ai';
@@ -10,7 +10,7 @@ export const sheetDocumentHandler = createDocumentHandler<'sheet'>({
     let draftContent = '';
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel('artifact-model'),
+      model: openRouterProvider.languageModel('artifact-model'),
       system: sheetPrompt,
       prompt: title,
       schema: z.object({
@@ -47,7 +47,7 @@ export const sheetDocumentHandler = createDocumentHandler<'sheet'>({
     let draftContent = '';
 
     const { fullStream } = streamObject({
-      model: myProvider.languageModel('artifact-model'),
+      model: openRouterProvider.languageModel('artifact-model'),
       system: updateDocumentPrompt(document.content, 'sheet'),
       prompt: description,
       schema: z.object({

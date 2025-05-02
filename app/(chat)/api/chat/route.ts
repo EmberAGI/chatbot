@@ -1,7 +1,5 @@
-import type {
-  UIMessage,
-} from 'ai';
-import  {
+import type { UIMessage } from 'ai';
+import {
   createDataStreamResponse,
   appendResponseMessages,
   smoothStream,
@@ -21,14 +19,13 @@ import {
   getTrailingMessageId,
 } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
+// import { createDocument } from '@/lib/ai/tools/create-document';
+// import { updateDocument } from '@/lib/ai/tools/update-document';
+// import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
+// import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
-import { myProvider } from '@/lib/ai/providers';
+import { openRouterProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
-import { cookies } from 'next/headers';
 
 import type { Session } from 'next-auth';
 
@@ -116,7 +113,7 @@ export async function POST(request: Request) {
     return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
+          model: openRouterProvider.languageModel(selectedChatModel),
           system: systemPrompt({
             selectedChatModel,
             walletAddress: validatedContext.walletAddress,
@@ -179,7 +176,7 @@ export async function POST(request: Request) {
 
         console.log('FN RES', result);
 
-        result.consumeStream();
+        // result.consumeStream(); // Calling consumeStream() here buffers the entire response server-side, preventing streaming to the client.
 
         result.mergeIntoDataStream(dataStream, {
           sendReasoning: true,
