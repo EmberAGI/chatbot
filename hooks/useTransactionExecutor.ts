@@ -44,7 +44,7 @@ export function useTransactionExecutor({
 }: UseTransactionExecutorArgs): UseTransactionExecutorReturn {
   // Internal Wagmi hook for sending transactions
   const {
-    data: txResultData, // Result data of the last successful transaction
+    data: _txResultData, // Result data of the last successful transaction
     error: wagmiTxError, // Raw error object from wagmi
     isPending: isWagmiTxPending, // Is wagmi currently sending ANY tx?
     isSuccess: isWagmiTxSuccess, // Was the last wagmi tx successful?

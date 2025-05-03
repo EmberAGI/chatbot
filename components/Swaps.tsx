@@ -9,7 +9,7 @@ import type { TxPlan } from "../lib/transactionUtils"; // Import shared types ->
 // Removed: getChainById, withSafeDefaults, toBigInt, signTx, ensureReady, approveTransaction, signMainTransaction
 // Removed: All local state related to approvals and transaction execution
 
-export function Transaction({
+export function Swaps({
   txPreview,
   txPlan,
 }: {
