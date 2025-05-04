@@ -21,7 +21,7 @@ export const chatAgents = [
   },
   {
     id: 'all' as const,
-    name: 'Default Agent',
+    name: 'All agents',
     description: 'All agents',
   },
 ] as const;
