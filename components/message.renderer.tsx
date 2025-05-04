@@ -139,11 +139,11 @@ export const MessageRenderer = ({
   if (type === "tool-invocation" && part.toolInvocation.state === "result") {
     const { toolInvocation } = part;
     const { result, toolCallId, toolName } = toolInvocation;
-    const toolInvocationResult = result?.result?.content[0]
-      ? JSON.parse(result?.result?.content[0]?.text)
+    const toolInvocationResult = result?.result?.content?.[0]
+      ? JSON.parse(result?.result?.content?.[0]?.text)
       : null;
     const getKeyFromResult = (key: string) =>
-      toolInvocationResult?.artifacts[0]?.parts[0]?.data?.[key];
+      toolInvocationResult?.artifacts?.[0]?.parts[0]?.data?.[key];
 
     // Default keys
     const txPlan = getKeyFromResult("txPlan");
