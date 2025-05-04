@@ -24,7 +24,7 @@ import type { ChatAgentId } from './agents/agents';
 const DEFAULT_SERVER_URLS = new Map<ChatAgentId, string>([
   ['ember-aave', 'http://173.230.139.151:3010/sse'],
   ['ember-camelot', 'http://173.230.139.151:3011/sse'],
-  ['ember-lp', 'http://localhost:3012/sse'],
+  ['ember-lp', 'http://173.230.139.151:3012/sse'],
 ]);
 const URL_CHAT_IDS = new Map<string, ChatAgentId>();
 DEFAULT_SERVER_URLS.forEach((value, key) => URL_CHAT_IDS.set(value, key));
