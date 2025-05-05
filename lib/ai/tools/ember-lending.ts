@@ -86,6 +86,7 @@ async function getTool(serverUrl: string) {
 
   // Try to discover tools
   console.log('Attempting to discover tools via MCP client...');
+  // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
   let toolsResponse;
   try {
     toolsResponse = await mcpClient.listTools();
@@ -164,6 +165,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
   const serverUrls = [
     DEFAULT_SERVER_URLS.get('ember-aave') ?? '',
     DEFAULT_SERVER_URLS.get('ember-camelot') ?? '',
+    DEFAULT_SERVER_URLS.get('ember-lp') ?? '',
   ];
   const tools = await Promise.all(serverUrls.map((url) => getTool(url)));
   const allTools: { [key: string]: CoreTool } = {};
