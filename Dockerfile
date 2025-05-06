@@ -6,7 +6,7 @@ RUN corepack enable
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm install
-RUN pnpm builddocker
+RUN pnpm build
 
 FROM node:23-slim AS runner
 WORKDIR /app
