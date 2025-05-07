@@ -1,7 +1,7 @@
+import type { UIMessage } from 'ai';
 import {
-  UIMessage,
-  appendResponseMessages,
   createDataStreamResponse,
+  appendResponseMessages,
   smoothStream,
   streamText,
 } from 'ai';
@@ -19,14 +19,22 @@ import {
   getTrailingMessageId,
 } from '@/lib/utils';
 import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
+// import { createDocument } from '@/lib/ai/tools/create-document';
+// import { updateDocument } from '@/lib/ai/tools/update-document';
+// import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
+// import { getWeather } from '@/lib/ai/tools/get-weather';
 import { isProductionEnvironment } from '@/lib/constants';
-import { myProvider } from '@/lib/ai/providers';
+import { openRouterProvider } from '@/lib/ai/providers';
 import { getTools as getDynamicTools } from '@/lib/ai/tools/ember-lending';
-import { cookies } from 'next/headers';
+
+import type { Session } from 'next-auth';
+
+import { z } from 'zod';
+
+const ContextSchema = z.object({
+  walletAddress: z.string().optional(),
+});
+type Context = z.infer<typeof ContextSchema>;
 
 export const maxDuration = 60;
 
@@ -36,13 +44,28 @@ export async function POST(request: Request) {
       id,
       messages,
       selectedChatModel,
+      context,
     }: {
       id: string;
       messages: Array<UIMessage>;
       selectedChatModel: string;
+      context: Context;
     } = await request.json();
 
-    const session = await auth();
+    const session: Session | null = await auth();
+
+    const validationResult = ContextSchema.safeParse(context);
+
+    if (!validationResult.success) {
+      return new Response(JSON.stringify(validationResult.error.errors), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    const validatedContext = validationResult.data;
 
     if (!session || !session.user || !session.user.id) {
       return new Response('Unauthorized', { status: 401 });
@@ -87,24 +110,27 @@ export async function POST(request: Request) {
 
     console.log('Dynamic tools:', dynamicTools);
 
-      return createDataStreamResponse({
+    return createDataStreamResponse({
       execute: (dataStream) => {
         const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
+          model: openRouterProvider.languageModel(selectedChatModel),
+          system: systemPrompt({
+            selectedChatModel,
+            walletAddress: validatedContext.walletAddress,
+          }),
           messages,
           maxSteps: 20,
           experimental_transform: smoothStream({ chunking: 'word' }),
           experimental_generateMessageId: generateUUID,
           tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-            ...dynamicTools
+            //getWeather,
+            //createDocument: createDocument({ session, dataStream }),
+            //updateDocument: updateDocument({ session, dataStream }),
+            //requestSuggestions: requestSuggestions({
+            //  session,
+            //  dataStream,
+            //}),
+            ...dynamicTools,
           },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
@@ -119,7 +145,7 @@ export async function POST(request: Request) {
                   throw new Error('No assistant message found!');
                 }
 
-                const [,assistantMessage] = appendResponseMessages({
+                const [, assistantMessage] = appendResponseMessages({
                   messages: [userMessage],
                   responseMessages: response.messages,
                 });
@@ -147,10 +173,10 @@ export async function POST(request: Request) {
             functionId: 'stream-text',
           },
         });
-          
+
         console.log('FN RES', result);
 
-        result.consumeStream();
+        // result.consumeStream(); // Calling consumeStream() here buffers the entire response server-side, preventing streaming to the client.
 
         result.mergeIntoDataStream(dataStream, {
           sendReasoning: true,
@@ -162,9 +188,12 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     const JSONerror = JSON.stringify(error, null, 2);
-    return new Response(`An error occurred while processing your request! ${JSONerror}` , {
-      status: 404,
-    });
+    return new Response(
+      `An error occurred while processing your request! ${JSONerror}`,
+      {
+        status: 404,
+      },
+    );
   }
 }
 
