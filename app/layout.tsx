@@ -5,6 +5,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
+import { auth } from "./(auth)/auth";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://questbook.emberai.xyz"),
@@ -53,6 +55,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
     <html
       lang="en"
@@ -86,7 +89,9 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position="top-center" />
-          <ProviderWrapper>{children}</ProviderWrapper>
+          <SessionProvider session={session}>
+            <ProviderWrapper>{children}</ProviderWrapper>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>
