@@ -15,8 +15,15 @@ import {
 import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import React, { useMemo } from "react";
+import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/app/(auth)/auth";
 
-export function ProviderWrapper({ children }: { children: React.ReactNode }) {
+export async function ProviderWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const config = useMemo(
     () =>
       getDefaultConfig({
@@ -35,6 +42,7 @@ export function ProviderWrapper({ children }: { children: React.ReactNode }) {
     () => cookieToInitialState(config, cookie),
     [config, cookie]
   );
+  const session = await auth();
 
   return (
     <>
@@ -43,16 +51,20 @@ export function ProviderWrapper({ children }: { children: React.ReactNode }) {
         reconnectOnMount={true}
         initialState={initialState}
       >
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider
-            theme={darkTheme({
-              accentColor: "#FF7224",
-              accentColorForeground: "#fff",
-            })}
-          >
-            {children}
-          </RainbowKitProvider>
-        </QueryClientProvider>
+        <SessionProvider refetchInterval={0} session={session}>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitSiweNextAuthProvider>
+              <RainbowKitProvider
+                theme={darkTheme({
+                  accentColor: "#FF7224",
+                  accentColorForeground: "#fff",
+                })}
+              >
+                {children}
+              </RainbowKitProvider>
+            </RainbowKitSiweNextAuthProvider>
+          </QueryClientProvider>
+        </SessionProvider>
       </WagmiProvider>
     </>
   );
