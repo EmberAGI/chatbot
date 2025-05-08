@@ -1,14 +1,8 @@
-import { compare } from 'bcrypt-ts';
-import NextAuth, { type User, type Session } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-
-import { getUser } from '@/lib/db/queries';
+import NextAuth from 'next-auth';
 
 import { authConfig } from './auth.config';
-
-interface ExtendedSession extends Session {
-  user: User;
-}
+import Credentials from 'next-auth/providers/credentials';
+import { parseSiweMessage, validateSiweMessage } from 'viem/siwe';
 
 export const {
   handlers: { GET, POST },
@@ -19,36 +13,52 @@ export const {
   ...authConfig,
   providers: [
     Credentials({
-      credentials: {},
-      async authorize({ email, password }: any) {
-        const users = await getUser(email);
-        if (users.length === 0) return null;
-        // biome-ignore lint: Forbidden non-null assertion.
-        const passwordsMatch = await compare(password, users[0].password!);
-        if (!passwordsMatch) return null;
-        return users[0] as any;
+      async authorize(credentials: any) {
+        try {
+          const siweMessage = parseSiweMessage(credentials?.message);
+
+          if (
+            !validateSiweMessage({
+              address: siweMessage?.address,
+              message: siweMessage,
+            })
+          ) {
+            return null;
+          }
+
+          return {
+            id: siweMessage.address,
+          };
+        } catch (e) {
+          console.error('Error authorizing user', e);
+          return null;
+        }
       },
+      credentials: {
+        message: {
+          label: 'Message',
+          placeholder: '0x0',
+          type: 'text',
+        },
+        signature: {
+          label: 'Signature',
+          placeholder: '0x0',
+          type: 'text',
+        },
+      },
+      name: 'Ethereum',
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-
-      return token;
-    },
-    async session({
-      session,
-      token,
-    }: {
-      session: ExtendedSession;
-      token: any;
-    }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-      }
-
+    async session({ session, token }) {
+      // @ts-ignore
+      session.address = token.sub;
+      // @ts-ignore
+      session.user = {
+        // @ts-ignore
+        id: 0,
+        name: token.sub,
+      };
       return session;
     },
   },

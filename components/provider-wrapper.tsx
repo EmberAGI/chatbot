@@ -16,14 +16,8 @@ import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import React, { useMemo } from "react";
 import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
-import { SessionProvider } from "next-auth/react";
-import { auth } from "@/app/(auth)/auth";
 
-export async function ProviderWrapper({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ProviderWrapper({ children }: { children: React.ReactNode }) {
   const config = useMemo(
     () =>
       getDefaultConfig({
@@ -33,17 +27,17 @@ export async function ProviderWrapper({
         ssr: true, // If your dApp uses server side rendering (SSR)
         storage: createStorage({ storage: cookieStorage }),
       }),
-    []
+    [],
   );
 
   const queryClient = useMemo(() => new QueryClient(), []);
   const cookie = cookieStorage.getItem("wagmi.storage") || "";
   const initialState = useMemo(
     () => cookieToInitialState(config, cookie),
-    [config, cookie]
+    [config, cookie],
   );
-  const session = await auth();
 
+  // @ts-ignore
   return (
     <>
       <WagmiProvider
@@ -51,20 +45,18 @@ export async function ProviderWrapper({
         reconnectOnMount={true}
         initialState={initialState}
       >
-        <SessionProvider refetchInterval={0} session={session}>
-          <QueryClientProvider client={queryClient}>
-            <RainbowKitSiweNextAuthProvider>
-              <RainbowKitProvider
-                theme={darkTheme({
-                  accentColor: "#FF7224",
-                  accentColorForeground: "#fff",
-                })}
-              >
-                {children}
-              </RainbowKitProvider>
-            </RainbowKitSiweNextAuthProvider>
-          </QueryClientProvider>
-        </SessionProvider>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitSiweNextAuthProvider>
+            <RainbowKitProvider
+              theme={darkTheme({
+                accentColor: "#FF7224",
+                accentColorForeground: "#fff",
+              })}
+            >
+              {children}
+            </RainbowKitProvider>
+          </RainbowKitSiweNextAuthProvider>
+        </QueryClientProvider>
       </WagmiProvider>
     </>
   );
