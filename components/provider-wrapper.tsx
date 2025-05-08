@@ -17,7 +17,11 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import React, { useMemo } from "react";
 import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
 
-export function ProviderWrapper({ children }: { children: React.ReactNode }) {
+export async function ProviderWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const config = useMemo(
     () =>
       getDefaultConfig({
@@ -36,6 +40,7 @@ export function ProviderWrapper({ children }: { children: React.ReactNode }) {
     () => cookieToInitialState(config, cookie),
     [config, cookie],
   );
+  const session = await auth();
 
   // @ts-ignore
   return (
