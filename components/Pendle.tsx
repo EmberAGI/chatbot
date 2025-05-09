@@ -77,46 +77,45 @@ export function Pendle({
           <div className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2">
             {markets?.map((market) => (
               <div key={market.data?.address}>
-                <span className="font-normal flex gap-3 w-full items-center text-sm">
-                  {market.data?.name}
+                <span className="font-normal flex gap-3 w-full items-center text-sm pb-2">
+                  {market.data?.name} -{" "}
+                  <span className="font-normal text-sm">
+                    On chain {market.data?.chainId}
+                    {" - Exp. "}
+                    {market.data?.expiry?.split("T")[0]}
+                  </span>
                 </span>
-
-                <p className="font-normal w-full ">
+                <p className="font-semibold w-full ">
                   <span className="font-normal">
-                    <span className="font-semibold text-sm">
-                      On chain {market.data?.chainId}
-                      {" - "}
-                      {market.data?.expiry?.split("T")[0]}
-                    </span>
-                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
-                      <span className="font-normal  text-sm">
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 mb-2">
+                      <span className="font-normal  text-xs">
                         <span className="font-semibold">Address: </span>{" "}
                         {market.data?.address}{" "}
                       </span>
                     </p>
-                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
-                      <span className="font-normal  text-sm">
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 mb-2">
+                      <span className="font-normal  text-xs">
                         <span className="font-semibold">PT: </span>{" "}
                         {market.data?.pt}{" "}
                       </span>
                     </p>
-                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
-                      <span className="font-normal  text-sm">
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 mb-2">
+                      <span className="font-normal  text-xs">
                         <span className="font-semibold">YT: </span>{" "}
                         {market.data?.yt}{" "}
                       </span>
                     </p>
-                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
-                      <span className="font-normal  text-sm">
+                    <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 mb-2">
+                      <span className="font-normal  text-xs">
                         <span className="font-semibold">SY: </span>{" "}
                         {market.data?.sy}{" "}
                       </span>
                     </p>
                   </span>
                 </p>
-                <p className="font-normal w-full bg-zinc-600 rounded-full p-2">
+                <span className="font-semibold pb-2">Underlying Asset: </span>{" "}
+                <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4">
                   <span className="font-normal flex gap-3 w-full items-center text-sm">
-                    <span className="font-semibold">Underlying Asset: </span>{" "}
                     {market.data?.underlyingAsset?.symbol}
                     {" - "}
                     {market.data?.underlyingAsset?.name}
@@ -127,7 +126,6 @@ export function Pendle({
                     {market.data?.underlyingAsset?.tokenUid?.chainId}
                   </span>
                 </p>
-
                 <div className="border-t border-gray-500 my-2" />
               </div>
             ))}
