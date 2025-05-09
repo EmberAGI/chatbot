@@ -74,9 +74,12 @@ export function Pendle({
           <h2 className="text-lg font-semibold mb-4">
             Available Pendle Markets:
           </h2>
-          <div className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2">
+          <div>
             {markets?.map((market) => (
-              <div key={market.data?.address}>
+              <div
+                key={market.data?.address}
+                className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2"
+              >
                 <span className="font-normal flex gap-3 w-full items-center text-sm pb-2">
                   {market.data?.name} -{" "}
                   <span className="font-normal text-sm">
