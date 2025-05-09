@@ -78,12 +78,12 @@ export function Pendle({
             {markets?.map((market) => (
               <div
                 key={market.data?.address}
-                className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2"
+                className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2 mb-4"
               >
-                <span className="font-normal flex gap-3 w-full items-center text-sm pb-2">
-                  {market.data?.name} -{" "}
+                <span className="font-semibold text-md flex gap-3 w-full items-center text-sm pb-2">
+                  {market.data?.name}
                   <span className="font-normal text-sm">
-                    On chain {market.data?.chainId}
+                    - On chain {market.data?.chainId}
                     {" - Exp. "}
                     {market.data?.expiry?.split("T")[0]}
                   </span>
@@ -116,20 +116,21 @@ export function Pendle({
                     </p>
                   </span>
                 </p>
-                <span className="font-semibold pb-2">Underlying Asset: </span>{" "}
-                <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 mb-4">
+                <span className="font-semibold pb-2">
+                  Underlying Asset:{" "}
                   <span className="font-normal flex gap-3 w-full items-center text-sm">
                     {market.data?.underlyingAsset?.symbol}
                     {" - "}
                     {market.data?.underlyingAsset?.name}
                   </span>
+                </span>{" "}
+                <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 mb-4">
                   <span className="font-normal  text-sm">
                     {market.data?.underlyingAsset?.tokenUid?.address}
                     {" on chain "}{" "}
                     {market.data?.underlyingAsset?.tokenUid?.chainId}
                   </span>
                 </p>
-                <div className="border-t border-gray-500 my-2" />
               </div>
             ))}
           </div>
