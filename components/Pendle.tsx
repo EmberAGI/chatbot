@@ -114,7 +114,7 @@ export function Pendle({
                   </span>
                 </p>
                 <span className="font-semibold pb-2">Underlying Asset: </span>{" "}
-                <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4">
+                <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 mb-4">
                   <span className="font-normal flex gap-3 w-full items-center text-sm">
                     {market.data?.underlyingAsset?.symbol}
                     {" - "}
