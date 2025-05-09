@@ -76,7 +76,7 @@ export function Pendle({
           </h2>
           <div className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2">
             {markets?.map((market) => (
-              <div>
+              <div key={market.data?.address}>
                 <span className="font-normal flex gap-3 w-full items-center text-sm">
                   {market.data?.name}
                 </span>
