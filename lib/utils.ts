@@ -167,38 +167,20 @@ export function getTrailingMessageId({
 
 export function strToDecimal(input: string): string {
   if (input === '∞') {
-    return '∞'
+    return '∞';
   } else {
     //convert decimal string into 2 decimal string
     const decimal = parseFloat(input);
     if (isNaN(decimal)) {
-      return ''
+      return '';
     }
-    const decimalString = decimal.toFixed(2).toString()
-    return decimalString
+    const decimalString = decimal.toFixed(2).toString();
+    return decimalString;
   }
 }
 
-//function to convert an address into 0xABC...AB1234 format and have it copy the full address to clipboard on click
-export function copyAddressToClipboard(address: string) {
-  const fullAddress = address;
-  navigator.clipboard.writeText(fullAddress).then(() => {
-    toast.success(`Copied to clipboard! \b ${fullAddress}`);
-  });
-}
+//function to convert an address into 0xABC...AB1234 format
 export function shortenAddress(address: string): string {
   if (address.length <= 6) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
-
-//function to take a string that's a float, multiply by 100 and convert it to a string with 2 decimal places
-export function formatPercentage(input: string): string {
-  const decimal = parseFloat(input);
-  if (isNaN(decimal)) {
-    return ''
-  }
-  const percentage = decimal * 100;
-  const percentageString = percentage.toFixed(2).toString()+ "%"
-  return percentageString
-}
-
