@@ -128,17 +128,15 @@ export function Liquidity({
                       </span>
                     </span>
                   </p>
-                  <span className="font-normal flex gap-3 w-full items-center text-sm">
+                  <span className="font-normal flex flex-col gap-3 w-full items-center text-sm">
                     <span className="text-md text-gray-400">
                       Price: {x.price}
                     </span>
-                  </span>
-                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
                     <span className="font-normal  text-sm">
                       Pool: {x.poolAddress}{" "}
                     </span>
-                  </p>
-                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
+                  </span>
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-0">
                     <span className="font-normal  text-sm">
                       {`Position Range from ${strToDecimal(
                         x.positionRange.fromPrice
@@ -160,8 +158,8 @@ export function Liquidity({
                     <span className="text-xs text-gray-400">{x.handle}</span>
                   </span>
 
-                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
-                    <span className="font-normal text-sm w-full">
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-0 flex flex-col">
+                    <span className="font-semibold text-sm w-full ">
                       {x.symbol0}
                       {" on "}
                       {x.token0.chainId}{" "}
@@ -171,8 +169,8 @@ export function Liquidity({
                     </span>
                   </p>
 
-                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
-                    <span className="font-normal text-sm w-full">
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-0 flex flex-col">
+                    <span className="font-semibold text-sm w-full">
                       {x.symbol1}
                       {" on "}
                       {x.token1.chainId}{" "}
