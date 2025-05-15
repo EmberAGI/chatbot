@@ -4,30 +4,49 @@ import { useAccount, useSwitchChain } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useTransactionExecutor } from "../hooks/useTransactionExecutor";
 import type { TxPlan } from "../lib/transactionUtils";
+import { strToDecimal } from "@/lib/utils";
 
 // Removed: useState, viem imports, useSendTransaction
 // Removed: getChainById, withSafeDefaults, toBigInt, signTx
 // Removed: All local state related to approvals and transaction execution
 
 // Keep existing interface if specific to Liquidity preview/positions
+interface IPool {
+  handle: string;
+  symbol0: string;
+  symbol1: string;
+  token0: { chainId: string; address: string };
+  token1: { chainId: string; address: string };
+  price: string;
+}
+
 interface IPosition {
   tokenId: string;
-  providerId: string;
+  poolAddress: string;
+  operator: string;
+  token0: { chainId: string; address: string };
+  token1: { chainId: string; address: string };
+  tokens0wed1: string;
+  tokens0wed0: string;
   symbol0: string;
   symbol1: string;
   amount0: string;
   amount1: string;
   price: string;
+  providerId: string;
+  positionRange: { fromPrice: string; toPrice: string };
 }
 
 export function Liquidity({
   positions,
   txPreview,
   txPlan,
+  pools,
 }: {
   positions: IPosition[] | null;
   txPlan: TxPlan | null;
   txPreview: any; // TODO: Define LiquidityTxPreview type
+  pools: IPool[] | null;
 }) {
   console.log("[Liquidity Component] Received txPreview:", txPreview);
   console.log("[Liquidity Component] Received txPlan:", txPlan);
@@ -75,7 +94,7 @@ export function Liquidity({
               </h2>
               {positions?.map((x) => (
                 <div
-                  key={x.tokenId + x.price}
+                  key={x.tokenId + x.poolAddress}
                   className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2"
                 >
                   <span className="font-normal flex gap-3 w-full items-center text-sm">
@@ -112,6 +131,59 @@ export function Liquidity({
                   <span className="font-normal flex gap-3 w-full items-center text-sm">
                     <span className="text-md text-gray-400">
                       Price: {x.price}
+                    </span>
+                  </span>
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
+                    <span className="font-normal  text-sm">
+                      Pool: {x.poolAddress}{" "}
+                    </span>
+                  </p>
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
+                    <span className="font-normal  text-sm">
+                      {`Position Range from ${strToDecimal(
+                        x.positionRange.fromPrice
+                      )} to ${strToDecimal(x.positionRange.toPrice)}`}
+                    </span>
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : pools ? (
+            <div className="flex flex-col gap-2 p-8 bg-transparent shadow-md rounded-2xl text-white border-red-200 border-2">
+              <h2 className="text-lg font-semibold mb-4">Liquidity Pools</h2>
+              {pools?.map((x) => (
+                <div
+                  key={x.handle + x.price}
+                  className="rounded-xl bg-zinc-700 p-4 flex flex-col gap-2"
+                >
+                  <span className="font-normal flex gap-3 w-full items-center text-sm">
+                    <span className="text-xs text-gray-400">{x.handle}</span>
+                  </span>
+
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
+                    <span className="font-normal text-sm w-full">
+                      {x.symbol0}
+                      {" on "}
+                      {x.token0.chainId}{" "}
+                    </span>
+                    <span className="font-normal text-sm w-full">
+                      {x.token0.address}{" "}
+                    </span>
+                  </p>
+
+                  <p className="font-normal w-full bg-zinc-600 rounded-full p-2 px-4 my-4">
+                    <span className="font-normal text-sm w-full">
+                      {x.symbol1}
+                      {" on "}
+                      {x.token1.chainId}{" "}
+                    </span>
+                    <span className="font-normal text-sm w-full">
+                      {x.token1.address}{" "}
+                    </span>
+                  </p>
+                  <span className="font-normal flex gap-3 w-full items-center text-sm">
+                    <span className="text-md text-gray-400">
+                      Price: {strToDecimal(x.price)}
                     </span>
                   </span>
                 </div>
