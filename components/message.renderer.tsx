@@ -130,7 +130,12 @@ export const MessageRenderer = ({
         ) : toolName.endsWith("askLendingAgent") ? (
           <Lending txPreview={null} txPlan={null} />
         ) : toolName.endsWith("askLiquidityAgent") ? (
-          <Liquidity positions={null} txPreview={null} txPlan={null} />
+          <Liquidity
+            positions={null}
+            txPreview={null}
+            txPlan={null}
+            pools={null}
+          />
         ) : null}
       </div>
     );
@@ -143,7 +148,7 @@ export const MessageRenderer = ({
       ? JSON.parse(result?.result?.content?.[0]?.text)
       : null;
     const getKeyFromResult = (key: string) =>
-      toolInvocationResult?.artifacts?.[0]?.parts[0]?.data?.[key];
+      toolInvocationResult?.artifacts?.[0]?.parts[0]?.data?.[key] || null;
 
     // Default keys
     const txPlan = getKeyFromResult("txPlan");
@@ -179,6 +184,7 @@ export const MessageRenderer = ({
           toolInvocationResult && (
             <Liquidity
               positions={getKeyFromResult("positions")}
+              pools={getKeyFromResult("pools")}
               txPreview={txPreview}
               txPlan={txPlan}
             />
