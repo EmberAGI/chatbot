@@ -14,6 +14,7 @@ import { DocumentPreview } from "./document-preview";
 import { MessageReasoning } from "./message-reasoning";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import { Swaps } from "./Swaps";
+import { Pendle } from "./Pendle";
 import { Lending } from "./Lending";
 import { Liquidity } from "./Liquidity";
 import type { Dispatch } from "react";
@@ -134,8 +135,13 @@ export const MessageRenderer = ({
             positions={null}
             txPreview={null}
             txPlan={null}
-            pools={null}
-          />
+            pools={null} />
+        ) : toolName.endsWith("askYieldTokenizationAgent") ? (
+          <Pendle
+            txPreview={null}
+            txPlan={null}
+            markets={[]}
+            isMarketList={false}             
         ) : null}
       </div>
     );
@@ -153,6 +159,9 @@ export const MessageRenderer = ({
     // Default keys
     const txPlan = getKeyFromResult("txPlan");
     const txPreview = getKeyFromResult("txPreview");
+
+    const getParts = () => toolInvocationResult?.artifacts[0]?.parts;
+    const getArtifact = () => toolInvocationResult?.artifacts[0];
 
     return (
       <div key={toolCallId}>
@@ -187,6 +196,15 @@ export const MessageRenderer = ({
               pools={getKeyFromResult("pools")}
               txPreview={txPreview}
               txPlan={txPlan}
+            />
+          )
+        ) : toolName.endsWith("askYieldTokenizationAgent") ? (
+          toolInvocationResult && (
+            <Pendle
+              txPreview={txPreview}
+              txPlan={txPlan}
+              markets={getParts()}
+              isMarketList={getArtifact()?.name === "yield-markets"}
             />
           )
         ) : null}

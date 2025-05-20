@@ -22,9 +22,12 @@ import type { ChatAgentId } from './agents/agents';
 }); */
 
 const DEFAULT_SERVER_URLS = new Map<ChatAgentId, string>([
-  ['ember-aave', 'http://localhost:3010/sse'],
-  ['ember-camelot', 'http://localhost:3011/sse'],
-  ['ember-lp', 'http://localhost:3012/sse'],
+
+  ['ember-aave', 'http://173.230.139.151:3010/sse'],
+  ['ember-camelot', 'http://173.230.139.151:3011/sse'],
+  ['ember-lp', 'http://173.230.139.151:3012/sse'],
+  ['ember-pendle', 'http://173.230.139.151:3013/sse'],
+
 ]);
 const URL_CHAT_IDS = new Map<string, ChatAgentId>();
 DEFAULT_SERVER_URLS.forEach((value, key) => URL_CHAT_IDS.set(value, key));
@@ -158,6 +161,12 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
       (process.env.MCP_SERVER_URL || DEFAULT_SERVER_URLS.get('ember-lp')) ?? '';
   }
 
+  if (agentIdFromCookie && agentIdFromCookie.value === 'ember-pendle') {
+    serverUrl =
+      (process.env.MCP_SERVER_URL || DEFAULT_SERVER_URLS.get('ember-pendle')) ?? '';
+  }
+
+
   if (!agentIdFromCookie || agentIdFromCookie.value !== 'all') {
     return await getTool(serverUrl);
   }
@@ -166,6 +175,7 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
     DEFAULT_SERVER_URLS.get('ember-aave') ?? '',
     DEFAULT_SERVER_URLS.get('ember-camelot') ?? '',
     DEFAULT_SERVER_URLS.get('ember-lp') ?? '',
+    DEFAULT_SERVER_URLS.get('ember-pendle') ?? '',
   ];
   const tools = await Promise.all(serverUrls.map((url) => getTool(url)));
   const allTools: { [key: string]: CoreTool } = {};
