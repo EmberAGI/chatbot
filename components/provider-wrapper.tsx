@@ -41,7 +41,6 @@ export async function ProviderWrapper({
     [config, cookie],
   );
 
-  // @ts-ignore
   return (
     <>
       <WagmiProvider
