@@ -1,8 +1,30 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type DefaultSession } from 'next-auth';
 
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
 import { parseSiweMessage, validateSiweMessage } from 'viem/siwe';
+import { getOrCreateUser } from '@/lib/db/queries';
+import type { DefaultJWT } from 'next-auth/jwt';
+
+declare module 'next-auth' {
+  interface Session extends DefaultSession {
+    user: {
+      id: string;
+      address: string;
+    } & DefaultSession['user'];
+  }
+  interface User {
+    id?: string;
+    address?: string;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT extends DefaultJWT {
+    id: string;
+    address: string;
+  }
+}
 
 export const {
   handlers: { GET, POST },
@@ -13,27 +35,7 @@ export const {
   ...authConfig,
   providers: [
     Credentials({
-      async authorize(credentials: any) {
-        try {
-          const siweMessage = parseSiweMessage(credentials?.message);
-
-          if (
-            !validateSiweMessage({
-              address: siweMessage?.address,
-              message: siweMessage,
-            })
-          ) {
-            return null;
-          }
-
-          return {
-            id: siweMessage.address,
-          };
-        } catch (e) {
-          console.error('Error authorizing user', e);
-          return null;
-        }
-      },
+      name: 'RainbowKit',
       credentials: {
         message: {
           label: 'Message',
@@ -46,20 +48,53 @@ export const {
           type: 'text',
         },
       },
-      name: 'Ethereum',
+      async authorize(credentials: any) {
+        try {
+          const siweMessage = parseSiweMessage(credentials?.message);
+
+          if (!siweMessage.address) {
+            return null;
+          }
+
+          if (
+            !validateSiweMessage({
+              address: siweMessage?.address,
+              message: siweMessage,
+            })
+          ) {
+            return null;
+          }
+
+          const user = (await getOrCreateUser(siweMessage.address))[0];
+          return {
+            id: user.id,
+            address: user.address,
+          };
+        } catch (e) {
+          console.error('Error authorizing user', e);
+          return null;
+        }
+      },
     }),
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      if (user?.id && user?.address) {
+        token.id = user.id;
+        token.address = user.address;
+      }
+
+      return token;
+    },
     async session({ session, token }) {
-      // @ts-ignore
-      session.address = token.sub;
-      // @ts-ignore
-      session.user = {
-        // @ts-ignore
-        id: 0,
-        name: token.sub,
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id,
+          address: token.address,
+        },
       };
-      return session;
     },
   },
 });
