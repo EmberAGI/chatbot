@@ -40,7 +40,6 @@ export async function ProviderWrapper({
     () => cookieToInitialState(config, cookie),
     [config, cookie],
   );
-  const session = await auth();
 
   // @ts-ignore
   return (
