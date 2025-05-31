@@ -15,8 +15,13 @@ import {
 import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import React, { useMemo } from "react";
+import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
 
-export function ProviderWrapper({ children }: { children: React.ReactNode }) {
+export async function ProviderWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const config = useMemo(
     () =>
       getDefaultConfig({
@@ -26,14 +31,14 @@ export function ProviderWrapper({ children }: { children: React.ReactNode }) {
         ssr: true, // If your dApp uses server side rendering (SSR)
         storage: createStorage({ storage: cookieStorage }),
       }),
-    []
+    [],
   );
 
   const queryClient = useMemo(() => new QueryClient(), []);
   const cookie = cookieStorage.getItem("wagmi.storage") || "";
   const initialState = useMemo(
     () => cookieToInitialState(config, cookie),
-    [config, cookie]
+    [config, cookie],
   );
 
   return (
@@ -44,14 +49,16 @@ export function ProviderWrapper({ children }: { children: React.ReactNode }) {
         initialState={initialState}
       >
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider
-            theme={darkTheme({
-              accentColor: "#FF7224",
-              accentColorForeground: "#fff",
-            })}
-          >
-            {children}
-          </RainbowKitProvider>
+          <RainbowKitSiweNextAuthProvider>
+            <RainbowKitProvider
+              theme={darkTheme({
+                accentColor: "#FF7224",
+                accentColorForeground: "#fff",
+              })}
+            >
+              {children}
+            </RainbowKitProvider>
+          </RainbowKitSiweNextAuthProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </>

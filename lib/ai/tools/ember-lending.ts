@@ -163,9 +163,9 @@ export const getTools = async (): Promise<{ [key: string]: CoreTool }> => {
 
   if (agentIdFromCookie && agentIdFromCookie.value === 'ember-pendle') {
     serverUrl =
-      (process.env.MCP_SERVER_URL || DEFAULT_SERVER_URLS.get('ember-pendle')) ?? '';
+      (process.env.MCP_SERVER_URL || DEFAULT_SERVER_URLS.get('ember-pendle')) ??
+      '';
   }
-
 
   if (!agentIdFromCookie || agentIdFromCookie.value !== 'all') {
     return await getTool(serverUrl);

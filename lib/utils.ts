@@ -167,15 +167,15 @@ export function getTrailingMessageId({
 
 export function strToDecimal(input: string): string {
   if (input === '∞') {
-    return '∞'
+    return '∞';
   } else {
     //convert decimal string into 2 decimal string
     const decimal = parseFloat(input);
     if (isNaN(decimal)) {
-      return ''
+      return '';
     }
-    const decimalString = decimal.toFixed(2).toString()
-    return decimalString
+    const decimalString = decimal.toFixed(2).toString();
+    return decimalString;
   }
 }
 
@@ -195,10 +195,9 @@ export function shortenAddress(address: string): string {
 export function formatPercentage(input: string): string {
   const decimal = parseFloat(input);
   if (isNaN(decimal)) {
-    return ''
+    return '';
   }
   const percentage = decimal * 100;
-  const percentageString = percentage.toFixed(2).toString()+ "%"
-  return percentageString
+  const percentageString = percentage.toFixed(2).toString() + '%';
+  return percentageString;
 }
-
