@@ -17,7 +17,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import React, { useMemo } from "react";
 import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
 
-export async function ProviderWrapper({
+export function ProviderWrapper({
   children,
 }: {
   children: React.ReactNode;
