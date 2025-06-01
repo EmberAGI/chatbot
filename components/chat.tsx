@@ -81,12 +81,20 @@ export function Chat({
     <>
       <div className="flex flex-col min-w-0 h-dvh bg-background">
         {(!session || !session.user) && (
-          <div className="fixed inset-0 backdrop-blur-sm bg-background/70 z-50 flex flex-col items-center justify-center gap-4">
-            <h2 className="text-xl font-semibold">Connect Your Wallet</h2>
-            <p className="text-muted-foreground mb-4">
-              Authentication required to chat with Ember Agents
-            </p>
-            <ConnectButton />
+          <div className="fixed inset-0 backdrop-blur-sm  bg-background/60 z-50 flex flex-col items-center justify-center gap-4">
+            <div className="backdrop-blur-sm rounded-xl border border-muted/20 shadow-lg p-8 flex flex-col items-center justify-center gap-6 animate-fade-in p-5 bg-zinc-700">
+              
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">
+                  Connect Your Wallet
+                </h2>
+                <p className="text-muted-foreground text-sm flex flex-col items-center justify-center">
+                  A valid wallet is required to chat with Ember Agents
+                </p>
+              
+              <div className="w-full max-w-xs flex flex-col items-center justify-center">
+                <ConnectButton />
+              </div>
+            </div>
           </div>
         )}
         <ChatHeader
